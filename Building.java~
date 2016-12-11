@@ -1,0 +1,30 @@
+import java.util.LinkedList;
+
+public class Building {
+  private String name;
+  WeightedAdjMatGraph<Room> building;
+  LinkedList<Floor> floors;
+  
+  public Building (String name) {
+    this.name = name;
+    this.building = new WeightedAdjMatGraph<Room>();
+    this.floors = new LinkedList<Floor>();
+  }
+  
+  public void addFloor(Floor f){
+    floors.add(f);
+  }
+  
+  public void addStairs() {
+  }
+  
+  public void addElevator() {
+  }
+  
+  public boolean sameFloor(Room r1, Room r2){
+    return r1.getFloor() == r2.getFloor();
+  }
+  
+  
+  
+}
