@@ -28,7 +28,7 @@ public interface WeightedGraph<T> {
   
   /** Inserts an edge between two vertices of this graph,
     * if the vertices exist. Else does not change the graph. */
-  public void addEdge (T vertex1, T vertex2);
+  public void addEdge (T vertex1, T vertex2, int weight);
   
   /** Removes an edge between two vertices of this graph,
     if the vertices exist, else does not change the graph. */

@@ -1,11 +1,13 @@
 /**
  * Clarissa Verish
+ * 12/11/2016
  * WeightedAdjMatGraph.java
  * 
  * Purpose: to be able to build an adjacency matrix that stores the data for 
  * weighted edges. The graph will be undirected when constructed.
  */
 
+import java.util.LinkedList;
 
 public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
   public static final int NOT_FOUND = -1;
@@ -56,22 +58,102 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
     return m / 2;
   }
   
-  public boolean isEdge (T vertex1, T vertex2);
+  /**
+   * Returns true if an edge exists between two vertices
+   */
+  public boolean isEdge (T vertex1, T vertex2){
+    int i1 = vertexIndex(vertex1);
+    int i2 = vertexIndex(vertex2);
+    if (i1 != NOT_FOUND && i2 != NOT_FOUND && edges[i1][i2] > 0){
+      return true;
+    }
+    return false;
+  }
   
-  public int edgeWeight(T vertex1, T vertex2);
+  /** 
+   * Returns weight of edge if it exists. If it does not,
+   * it returns NOT_FOUND (-1)
+   */
+  public int edgeWeight(T vertex1, T vertex2){
+    if (isEdge(vertex1, vertex2)){
+      return edges[vertexIndex(vertex1)][vertexIndex(vertex2)];
+    }
+    return NOT_FOUND;
+  }
   
-  public void addVertex (T vertex);
+  /**
+   * Adds vertex if it does not already exist, and autopopulates
+   * all newly created edges between old vertices and new vertex with -1.
+   */
+  public void addVertex (T vertex){
+    if (vertexIndex(vertex) > 0) return; // vertex already in graph, return.
+    if (n == vertices.length){ // need to expand capacity of arrays
+      expandCapacity();
+    }
+    
+    vertices[n] = vertex;
+    for (int i = 0; i < n; i++){ // populating new edges with -1
+      vertices[n][i] = -1;
+      vertices[i][n] = -1;
+    }
+    n++;
+  }
   
-  public void removeVertex (T vertex);
+  /**
+   * Removes the given vertex if possible.
+   */
+  public void removeVertex (T vertex){
+    int index = vertexIndex(vertex);
+    
+    if (index < 0) return; // vertex does not exist
+    
+    n--;
+    // IF THIS DOESN'T WORK make separate loop for column moving
+    for (int i = index; i < n; i++){
+      vertices[i] = vertices[i + 1];
+      for (int j = 0; j < n; j++){
+        edges[j][i] = edges[j][i + 1]; // moving row up
+        edges[i] = edges[i + 1]; // moving column over
+      }
+    }
+  }
   
-  public void addEdge (T vertex1, T vertex2);
+  public void addEdge (T vertex1, T vertex2, int weight){
+    int i1 = vertexIndex(vertex1);
+    int i2 = vertexIndex(vertex2);
+    
+    if (i1 == NOT_FOUND || i2 == NOT_FOUND) return;
+    
+    edges[i1][i2] = weight;
+    edges[i2][i1] = weight;
+  }
   
-  public void removeEdge (T vertex1, T vertex2);
+  public void removeEdge (T vertex1, T vertex2){
+    int i1 = vertexIndex(vertex1);
+    int i2 = vertexIndex(vertex2);
+    
+    if (i1 == NOT_FOUND || i2 == NOT_FOUND) return;
+    
+    edges[i1][i2] = -1;
+    edges[i2][i1] = -1;
+  }
   
-  public LinkedList<T> getNeighbors(T vertex);
+  public LinkedList<T> getNeighbors(T vertex){
+    LinkedList<T> neighbors = new LinkedList<T>;
+    int index = vertexIndex(vertex);
+    
+    for (int i = 0; i < n; i++){
+      if (edges[n][j] > 0){
+        neighbors.add(vertices[i]);
+      }
+    }
+    return neighbors;
+  }
   
   /** Returns a string representation of the adjacency matrix. */
-  public String toString();
+  public String toString(){
+    return "";
+  }
   
   
   /***********************************
