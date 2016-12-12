@@ -8,6 +8,9 @@
  */
 
 import java.util.LinkedList;
+import javafoundations.ArrayIterator;
+import java.lang.Iterable;
+import java.util.Iterator;
 
 public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
   public static final int NOT_FOUND = -1;
@@ -29,7 +32,7 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
     **********************************/
 
   public boolean isEmpty(){
-    return n = 0;
+    return n == 0;
   }
   
   /**
@@ -50,7 +53,7 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
     // increments counter if so.
     for (int i = 0; i < n; i++){
       for (int j = 0; j < n; j++){
-        if (vertexIndex(edges[i][j]) > 0){
+        if (edges[i][j] > 0){
           m++;
         }
       }
@@ -93,8 +96,8 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
     
     vertices[n] = vertex;
     for (int i = 0; i < n; i++){ // populating new edges with -1
-      vertices[n][i] = -1;
-      vertices[i][n] = -1;
+      edges[n][i] = -1;
+      edges[i][n] = -1;
     }
     n++;
   }
@@ -139,11 +142,11 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
   }
   
   public LinkedList<T> getNeighbors(T vertex){
-    LinkedList<T> neighbors = new LinkedList<T>;
+    LinkedList<T> neighbors = new LinkedList<T>();
     int index = vertexIndex(vertex);
     
     for (int i = 0; i < n; i++){
-      if (edges[n][j] > 0){
+      if (edges[n][i] > 0){
         neighbors.add(vertices[i]);
       }
     }
@@ -152,7 +155,37 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
   
   /** Returns a string representation of the adjacency matrix. */
   public String toString(){
-    return "";
+    String s = "";
+    s += "\t";
+    
+    for (int i = 0; i < n; i++){
+      // adding vertices for columns
+      s += vertices[i] + "\t";
+    }
+    
+    s += "\n";
+    
+    for (int i = 0; i < n; i++){
+      s += vertices[i] + "\t"; // vertex for row
+      for (int j = 0; j < n; j++){
+        s += edges[j][i] + "\t"; // adding edges across row
+      }
+      s += "\n";
+    }
+    
+    return s;
+  }
+  
+  /***********************************
+    ***** IMPLEMENTING ITERABLE ******
+    **********************************/
+  
+  public Iterator<T> iterator(){
+    ArrayIterator<T> iter = new ArrayIterator<T>();
+    for (int i = 0; i < n; i++){
+      iter.add(vertices[i]);
+    }
+    return (Iterator<T>)(iter);
   }
   
   
@@ -167,7 +200,7 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
    */
   private int vertexIndex(T obj){
     for (int i = 0; i < n; i++){
-      if (obj.compareTo(vertices[i]) == 0){
+      if (obj.equals(vertices[i])){
         return i;
       }
     }
