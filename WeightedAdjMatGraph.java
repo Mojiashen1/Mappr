@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import javafoundations.ArrayIterator;
 import java.lang.Iterable;
 import java.util.Iterator;
+import javafoundations.LinkedStack;
 
 public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
   public static final int NOT_FOUND = -1;
@@ -187,6 +188,57 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
     }
     return (Iterator<T>)(iter);
   }
+  
+
+    
+  /***********************************
+    ********** WEIGHTED PATH *********
+    **********************************/
+  
+  private class WeightedPath {
+    private int pathWeight;
+    private LinkedStack<T> path;
+    
+    public WeightedPath(T start){
+      path = new LinkedStack<T>();
+      path.push(start);
+      pathWeight = 0;
+    }
+    
+    /**
+     * adds a room to the path
+     */
+    public void expandPath(T obj){
+      
+    }
+    
+    /**
+     * gets the current path weight
+     */
+    public int getPathWeight(){
+      return pathWeight;
+    }
+    
+    /** 
+     * sets new path weight
+     */
+    public void setPathWeight(int n){
+      pathWeight = n;
+    }
+    
+    /**
+     * returns the last-visited room for this path
+     */
+    public T getLastVisited(){
+      return path.peek();
+    }
+  }
+  
+  /***********************************
+    ********* PATH TRAVERSAL *********
+    **********************************/
+  
+  
   
   
   /***********************************
