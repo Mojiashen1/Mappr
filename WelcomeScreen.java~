@@ -1,0 +1,19 @@
+public class WelcomeScreen {
+  MapperGUI gui;
+  
+  public class WelcomeScreen (MapperGUI gui) {
+    this.gui = gui;
+  }
+  
+  private void initialize () {
+    JLabel label = new JLabel();
+    label.setText("Welcome to Mappr");
+    label.setFont(new Font("Garamond", Font.PLAIN, 24));
+    frame.add(label);
+    
+    JButton startButton = new JButton();
+    startButton.addActionListener(new ButtonListener());
+    frame.add(startButton);
+  }
+  
+}
