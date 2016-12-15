@@ -8,7 +8,7 @@ public class MapprGUI extends JFrame{
   private InstructionScreen instructionScreen;
   
   public MapprGUI() {
-    setSize(600000, 240000);
+    setSize(320, 568);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     welcomeScreen = new WelcomeScreen(this);
     welcomeScreen.setVisible(true);
@@ -19,7 +19,7 @@ public class MapprGUI extends JFrame{
     
     getContentPane().add(welcomeScreen);
     
-    pack();
+    //pack();
     setVisible(true);
   }
   
@@ -39,7 +39,7 @@ public class MapprGUI extends JFrame{
       default:
         getContentPane().add(welcomeScreen);
     }
-    
+
     invalidate();
     validate();
   }
