@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.Font;
 import java.awt.event.*;
 
-public class WelcomeScreen extends JPanel{
+public class WelcomeScreen extends JPanel implements Screen {
   private MapprGUI gui;
   private JButton startButton;
   private JLabel label;
@@ -22,11 +22,15 @@ public class WelcomeScreen extends JPanel{
     startButton.addActionListener(new ButtonListener());
     add(startButton);
   }
+
+  public ScreenType getType() {
+    return ScreenType.WELCOME;
+  }
   
   private class ButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent event){
       if (event.getSource() == startButton) {
-        gui.switchScreen();       
+        gui.switchScreen(getType());       
       }
     }
   }

@@ -22,11 +22,15 @@ public class InstructionScreen extends JPanel{
     startButton.addActionListener(new ButtonListener());
     add(startButton);
   }
+
+  public ScreenType getType() {
+    return ScreenType.INSTRUCTION;
+  }
   
   private class ButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent event){
       if (event.getSource() == startButton) {
-        gui.switchScreen();       
+        gui.switchScreen(getType());       
       }
     }
   }

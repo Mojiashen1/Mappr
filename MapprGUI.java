@@ -23,19 +23,25 @@ public class MapprGUI extends JFrame{
     setVisible(true);
   }
   
-  public void switchScreen() {
-    System.out.println(getComponent(0));
-    if (getComponent(0) instanceof WelcomeScreen) {
-      getContentPane().removeAll();
-      getContentPane().add(inputScreen);
-      invalidate();
-      validate();
-    } else if (getComponents()[0] instanceof InputScreen) {
-      getContentPane().removeAll();
-      getContentPane().add(instructionScreen);
-      invalidate();
-      validate();
+  public void switchScreen(ScreenType type) {
+    getContentPane().removeAll();
+
+    switch(type) {
+      case WELCOME:
+        getContentPane().add(inputScreen);
+        break;
+      case INPUT:
+        getContentPane().add(instructionScreen);
+        break;
+      case INSTRUCTION:
+        getContentPane().add(inputScreen);
+        break;
+      default:
+        getContentPane().add(welcomeScreen);
     }
+    
+    invalidate();
+    validate();
   }
   
   public static void main(String [] args) {
