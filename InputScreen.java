@@ -10,7 +10,7 @@ public class InputScreen extends JPanel implements Screen {
   private JRadioButton noPreference, stairOnly, elevatorOnly;
   private ButtonGroup preferences;
   private JPanel buttonPanel;
-  private JLabel fromLabel, toLabel, prefLabel;
+  private JLabel fromLabel, toLabel, prefLabel, validateLabel;
   
   public InputScreen(MapprGUI gui) {
     this.gui = gui;
@@ -73,9 +73,13 @@ public class InputScreen extends JPanel implements Screen {
     searchButton.addActionListener(new ButtonListener());
     add(searchButton);
 
-    // startButton = new JButton("Let's Go!");
-    // startButton.addActionListener(new ButtonListener());
-    // add(startButton);
+  }
+  
+  public boolean validate(JTextField text) {
+    if (text.getText().equals("")) {
+      return false;
+    }
+    return true;
   }
 
   public ScreenType getType() {
@@ -85,7 +89,15 @@ public class InputScreen extends JPanel implements Screen {
   private class ButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent event){
       if (event.getSource() == searchButton) {
-        gui.switchScreen(getType());       
+        //if the from field is empty
+        if (!validate(from) || !validate(to)) {
+          validateLabel = new JLabel();
+          validateLabel.setText("Input fields can't be empty.");
+          validateLabel.setFont(new Font("Garamond", Font.PLAIN, 16));
+          add(validateLabel);
+        } else {
+          gui.switchScreen(getType());    
+        }
       }
     }
   }

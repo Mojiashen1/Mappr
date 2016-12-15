@@ -1,3 +1,3 @@
 public interface Screen {
-	public ScreenType getType();
+ public ScreenType getType();
 }

@@ -1,3 +1,3 @@
 public enum ScreenType {
-	WELCOME, INPUT, INSTRUCTION
+ WELCOME, INPUT, INSTRUCTION
 }
