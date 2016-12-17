@@ -140,10 +140,46 @@ public class Building {
       // find all traversals on both floors to each elevator, then check
       // to find traversal with shortest total distance.
       // once found, empty second queue into first queue then return 1st queue.
+
+      Floor fl1 = getFloorByNumber(floor1);
+      Floor fl2 = getFloorByNumber(floor2);
+
+      LinkedList<Elevator> connections = getElevatorsBetweenFloors(fl1, fl2);
+
+      WeightedPath minPath = null, fl1Path, fl2Path;
+      int minDistance = Integer.MAX_VALUE, combinedWeight;
+      Queue<Room> combinedPath;
+
+      for(Elevator e : connections) {
+        fl1Path = fl1.traverseFloor(r1, e);
+        fl2Path = fl2.traverseFloor(e, r2);
+
+        combinedWeight = fl1Path.getWeight() + fl2Path.getWeight();
+        combinedPath = combineQueues(fl1Path.getPath(), fl2Path.getPath());
+
+        if(combinedWeight < minDistance) {
+          minPath = new WeightedPath(combinedPath, combinedWeight);
+          minDistance = combinedWeight;
+        }
+      }
+
+      if(minPath != null) {
+        return minPath.getPath();
+      }
     }
     
     
     return traversal;
+  }
+
+  private Queue<Room> combineQueues(Queue<Room> queue1, Queue<Room> queue2) {
+    int stop = queue2.size();
+    queue2.dequeue();
+    for(int i = 1; i < stop; i++) {
+      queue1.enqueue(queue2.dequeue());
+    }
+
+    return queue1;
   }
 
   private Floor getFloorByNumber(int floorNumber) {
@@ -200,6 +236,8 @@ public class Building {
     floor2.addRoom(room4);
     floor2.addRoom(elevator1);
     floor2.addRoom(elevator2);
+    floor2.connectRooms(elevator1, room3, 1);
+    floor2.connectRooms(room3, room4, 2);
 
     floor3.addRoom(elevator2);
 
@@ -210,5 +248,6 @@ public class Building {
     System.out.println("Floors 1 & 2 are connected: " + building.isConnected(floor1, floor2));
     System.out.println("Floors 1 & 3 are directly connected: " + building.isConnected(floor1, floor3));
     System.out.println("Path between Room1 and Elevator1 on Floor1: " + building.traverseBuilding(room1, elevator1));
+    System.out.println("Path between Room1 and Room 4: " + building.traverseBuilding(room1, room4));
   }
 }
