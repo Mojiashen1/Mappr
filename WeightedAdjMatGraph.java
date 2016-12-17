@@ -12,6 +12,7 @@ import javafoundations.ArrayIterator;
 import java.lang.Iterable;
 import java.util.Iterator;
 import javafoundations.LinkedStack;
+import javafoundations.ArrayQueue;
 
 public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
   public static final int NOT_FOUND = -1;
@@ -78,7 +79,7 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
    * Returns weight of edge if it exists. If it does not,
    * it returns NOT_FOUND (-1)
    */
-  public int edgeWeight(T vertex1, T vertex2){
+  public int getEdgeWeight(T vertex1, T vertex2){
     if (isEdge(vertex1, vertex2)){
       return edges[vertexIndex(vertex1)][vertexIndex(vertex2)];
     }
@@ -147,13 +148,27 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
     int index = vertexIndex(vertex);
     
     for (int i = 0; i < n; i++){
-      if (edges[n][i] > 0){
+      if (edges[index][i] > 0){
         neighbors.add(vertices[i]);
       }
     }
     return neighbors;
   }
   
+  /** Returns the shortest path traveled between two vertices on 
+    * a graph as a LinkedQueue */
+  public ArrayQueue<T> getShortestPath(T vertex1, T vertex2){
+    DijkstraShortestPath p = new DijkstraShortestPath(vertex1, vertex2);
+    return p.getMinPath();
+  }
+  
+  /** Returns the shortest distance between two vertices on a graph */
+  public int getShortestDistance(T vertex1, T vertex2){
+    DijkstraShortestPath p = new DijkstraShortestPath(vertex1, vertex2);
+    return p.getMinDistance();
+  }
+  
+
   /** Returns a string representation of the adjacency matrix. */
   public String toString(){
     String s = "";
@@ -190,57 +205,162 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
   }
   
 
-    
+  
+  
+
+  
   /***********************************
-    ********** WEIGHTED PATH *********
+    ***** DIJKSTRA SHORTEST PATH *****
     **********************************/
   
-  private class WeightedPath {
-    private int pathWeight;
-    private LinkedStack<T> path;
+  /**
+   * computes the shortest path to traverse graph using Dijkstra's algorithm.
+   * - all nodes start in unvisited linkedlist, and the distances from all nodes
+   *   to the start node is stored in an array and start at infinity. 
+   * - the start node is added to the visited, removed from unvisited, node's
+   *   distance is set to zero, and node is set as current node
+   * - find all neighbors of current node - if neighbor hasn't been visited, find
+   *   (distance from current node to start) + (edge weight from current to neighbor)
+   * - if distance for neighbor is less than already-stored distance, change to this
+   *   distance
+   * - after looking at all neighbors, set unvisited neighbor with shortest distance to 
+   *   start equal to the current node, and repeat
+   */
+  
+  private class DijkstraShortestPath {
+    private T start, end; // starting and ending vertices
+    private int totalDistance;
+    private int[] distances; // distance from start 
+    private T[] closestPredecessor; // closest predecessor for each node (null if start node)
+    private LinkedList<T> visited, unvisited; // visited and unvisited vertices
+    private ArrayQueue<T> path; // shortest path
+
     
-    public WeightedPath(T start){
-      path = new LinkedStack<T>();
-      path.push(start);
-      pathWeight = 0;
-    }
     
-    /**
-     * adds a room to the path
-     */
-    public void expandPath(T obj){
+    public DijkstraShortestPath(T start, T end){
+      this.start = start;
+      this.end = end;
+      visited = new LinkedList<T>();
+      unvisited = new LinkedList<T>();
+      distances = new int[n];
+      path = new ArrayQueue<T>();
+      closestPredecessor = (T[])(new Object[n]);
+      
+      for (int i = 0; i < n; i++){ 
+        distances[i] = Integer.MAX_VALUE; // setting distances to infinity
+        unvisited.add(vertices[i]); // adding all vertices to unvisited
+      }
+      // setting start index as visited
+      visited.add(start);
+      unvisited.remove(start);
+      distances[vertexIndex(start)] = 0;
+      computeShortestPath();
       
     }
     
     /**
-     * gets the current path weight
+     * returns a queue of the minimum path produced
      */
-    public int getPathWeight(){
-      return pathWeight;
-    }
-    
-    /** 
-     * sets new path weight
-     */
-    public void setPathWeight(int n){
-      pathWeight = n;
+    public ArrayQueue<T> getMinPath(){
+      return path;
     }
     
     /**
-     * returns the last-visited room for this path
+     * returns the minimum distance from start to end
      */
-    public T getLastVisited(){
-      return path.peek();
+    public int getMinDistance(){
+      return totalDistance;
     }
+    
+    
+    
+    // computes the shortest path using Dijkstra's algorithm.
+    // does not return anything.
+    private void computeShortestPath(){
+      T current = start;
+      boolean atEnd = false;
+      while (!unvisited.isEmpty()&& !atEnd){
+        int currentIndex = vertexIndex(current);
+        LinkedList<T> neighbors = getUnvisitedNeighbors(current); // getting unvisited neighbors
+        
+        if (neighbors.isEmpty()){
+          
+        }
+        
+        // looping through to find distances from start to neighbors
+        for (T neighbor : neighbors){ 
+          int neighborIndex = vertexIndex(neighbor); 
+          int d = distances[currentIndex] + getEdgeWeight(current, neighbor);
+          
+          if (d < distances[neighborIndex]){ // if this distance is less than previous distance
+            distances[neighborIndex] = d;
+            closestPredecessor[neighborIndex] = current; // now closest predecessor is current
+          }
+        }
+        
+        if (current.equals(end)){
+          atEnd = true;
+        }
+        else{
+        // finding unvisited node that is closest to start node
+          T min = getMinUnvisited();
+          if (min != null){
+            unvisited.remove(min); // remove minimum neighbor from unvisited
+            visited.add(min); // add minimum neighbor to visited
+            current = min;
+          }
+        }
+      }
+      computePath();
+      totalDistance = distances[vertexIndex(end)];
+    }
+     
+    // returns a queue of the minimum path by following closestPredecessor
+    private void computePath(){
+      LinkedStack<T> reversePath = new LinkedStack<T>();
+      // adding end vertex to reversePath
+      T current = end; // first node is the end one
+      while (!current.equals(start)){
+        reversePath.push(current); // adding current to path
+        current = closestPredecessor[vertexIndex(current)]; // changing to closest predecessor to current
+      }
+      reversePath.push(current); // adding the start vertex
+      
+      while (!reversePath.isEmpty()){
+        path.enqueue(reversePath.pop());
+      }
+    }
+    
+    // returns a list of unvisited neighbors of the input vertex
+    private LinkedList<T> getUnvisitedNeighbors(T vertex){
+      LinkedList<T> neighbors = getNeighbors(vertex);
+      LinkedList<T> unvisitedNeighbors = new LinkedList<T>();
+      
+      for (T neighbor : neighbors){
+        if (!visited.contains(neighbor)){
+          unvisitedNeighbors.add(neighbor);
+        }
+      }
+      return unvisitedNeighbors;
+    }
+    
+    // finds the unvisited neighbor with the smallest distance from the
+    // start vertex
+    private T getMinUnvisited(){
+      if (unvisited.isEmpty()) return null;
+      T min = unvisited.get(0);
+      for (int i = 1; i < unvisited.size(); i++){
+        T temp = unvisited.get(i);
+        if (distances[vertexIndex(temp)] < distances[vertexIndex(min)]){
+          min = temp;
+        }
+      }
+      return min;
+    }
+
   }
-  
-  /***********************************
-    ********* PATH TRAVERSAL *********
-    **********************************/
-  
-  
-  
-  
+
+ 
   /***********************************
     ******** HELPER FUNCTIONS ********
     **********************************/
@@ -276,4 +396,52 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
     vertices = tempVertices;
     edges = tempEdges;
   }  
+  
+  
+  
+  public static void main(String[] args){
+    WeightedAdjMatGraph<String> w = new WeightedAdjMatGraph<String>();
+    w.addVertex("A");
+    w.addVertex("B");
+    w.addVertex("C");
+    w.addVertex("D");
+    w.addVertex("E");
+    w.addVertex("F");
+    
+    w.addEdge("A", "B", 2);
+    w.addEdge("A", "F", 4);
+    w.addEdge("B", "C", 1);
+    w.addEdge("B", "F", 6);
+    w.addEdge("C", "F", 5);
+    w.addEdge("C", "D", 2);
+    w.addEdge("C", "E", 5);
+    w.addEdge("D", "E", 1);
+
+    
+    System.out.println(w);
+    System.out.println("num vertices: " + w.n() + "; num edges: " + w.m());
+    System.out.println("edge b/w A and C? " + w.isEdge("A", "C"));
+    System.out.println("edge b/w E and C? " + w.isEdge("E", "C"));
+    System.out.println("edge weight b/w E and C? " + w.getEdgeWeight("E", "C"));
+    System.out.println("neighbors of A: " + w.getNeighbors("A"));
+    System.out.println("shortest distance from A to D: " + w.getShortestDistance("A", "D"));
+    System.out.println("shortest path:\n" + w.getShortestPath("A", "D"));
+    System.out.println("shortest distance from E to F: " + w.getShortestDistance("E", "F"));
+    System.out.println("shortest path:\n" + w.getShortestPath("E", "F"));
+    
+    System.out.println("removing B....");
+    
+    w.removeVertex("B");
+    
+    System.out.println(w);
+    
+    System.out.println("shortest distance from A to D: " + w.getShortestDistance("A", "D"));
+    System.out.println("shortest path:\n" + w.getShortestPath("A", "D"));
+    System.out.println("shortest distance from E to F: " + w.getShortestDistance("E", "F"));
+    System.out.println("shortest path:\n" + w.getShortestPath("E", "F"));
+  }
+  
+  
+  
+  
 }
