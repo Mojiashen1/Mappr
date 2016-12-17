@@ -4,7 +4,7 @@
  * 
  * */
 
-public class Room {
+public class Room{
   private String name;
   private Room north, south, east, west;
   private int floor;
@@ -79,5 +79,8 @@ public class Room {
     this.west = west;
   }
   
-  
+
+  public String toString() {
+    return name;
+  }
 }

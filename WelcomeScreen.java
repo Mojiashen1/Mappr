@@ -1,3 +1,10 @@
+/*
+ * Author: Mojia Shen
+ * Purpose: WelcomeScreen is the first screen the users see. 
+ * It has a title, subtitle and a button that takes the user to the InputScreen where they input where they want to go
+ * Date: Dec 17th 2016
+ * */
+
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -6,12 +13,6 @@ import java.awt.event.*;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Dimension;
-
-/*
- * Author: Mojia Shen
- * Purpose: WelcomeScreen is the first screen the users see. It has a title, subtitle and a button that takes the user to the InputScreen where they input where they want to go
- * Date: Dec 17th 2016
- * */
 
 public class WelcomeScreen extends JPanel implements Screen {
   private MapprGUI gui;

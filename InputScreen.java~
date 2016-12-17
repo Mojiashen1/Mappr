@@ -168,7 +168,7 @@ public class InputScreen extends JPanel implements Screen {
    * */ 
   private class ButtonListener implements ActionListener {
     /*actionPerformed is a method required by ActionListener interface
-     * It takes an event and if the source of the even is searchButton, it will switch screen to the next
+     * It takes an event and if the source of the event is searchButton, it will switch screen to the next
      * */
     public void actionPerformed(ActionEvent event){
       if (event.getSource() == searchButton) {

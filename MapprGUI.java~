@@ -39,7 +39,9 @@ public class MapprGUI extends JFrame{
       default:
         getContentPane().add(welcomeScreen);
     }
-
+    //repaint the screen
+    repaint();
+    //refresh the screen
     invalidate();
     validate();
   }

@@ -10,14 +10,14 @@ public class Building {
   private HashMap<String, LinkedList<Floor>> elevators;
   private LinkedList<Floor> floors;
   
-  // Constructor
+  // Constructor 1 that takes a name and set elevators and floors to empty HashMap and LinkedList 
   public Building (String name) {
     this.name = name;
     this.elevators = new HashMap<String, LinkedList<Floor>>();
     this.floors = new LinkedList<Floor>();
   }
 
-  // Constructor
+  // Constructor 2 that takes a name and a file to read
   public Building(String name, String fileName) {
     this(name);
     readFromTextFile(fileName);

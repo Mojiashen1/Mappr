@@ -1,3 +1,10 @@
+/*
+ * Author: Mojia Shen
+ * Purpose: InputScreen is the second screen the users see. 
+ * It asks the user to input where they are, where they want to go, and add their preferences for elevator or stair. 
+ * Date: Dec 17th 2016
+ * */
+
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -10,13 +17,6 @@ import java.awt.event.*;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Dimension;
-
-/*
- * Author: Mojia Shen
- * Purpose: InputScreen is the second screen the users see. 
- * It asks the user to input where they are, where they want to go, and add their preferences for elevator or stair. 
- * Date: Dec 17th 2016
- * */
 
 public class InputScreen extends JPanel implements Screen {
   private MapprGUI gui;
@@ -51,7 +51,7 @@ public class InputScreen extends JPanel implements Screen {
     JPanel textPanel1 = new JPanel(new GridLayout(3, 1));
     textPanel1.add(new JLabel());
     //**create a text input field FROM
-    from = new JTextField();
+    from = new JTextField("E101");
     from.setFont(new Font("Brandon Grotesque", Font.PLAIN, 12));
     from.setForeground(new Color(94, 93, 92));
     textPanel1.add(from);
@@ -71,7 +71,7 @@ public class InputScreen extends JPanel implements Screen {
     JPanel textPanel2 = new JPanel(new GridLayout(3, 1));
     textPanel2.add(new JLabel());
     //**create a new text input field TO
-    to = new JTextField();
+    to = new JTextField("E256");
     to.setFont(new Font("Brandon Grotesque", Font.PLAIN, 12));
     to.setForeground(new Color(94, 93, 92));
     textPanel2.add(to);
