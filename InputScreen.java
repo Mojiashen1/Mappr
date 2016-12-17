@@ -162,6 +162,21 @@ public class InputScreen extends JPanel implements Screen {
   public ScreenType getType() {
     return ScreenType.INPUT;
   }
+
+  private RouteDataTransfer createRDTO() {
+    String pref = "";
+
+    if(noPreference.isSelected()) {
+      pref = "No Preferences";
+    } else if (stairOnly.isSelected()) {
+      pref = "Stair";
+    } else {
+      pref = "Elevator";
+    }
+
+    RouteDataTransfer rDto = new RouteDataTransfer(from.getText(), to.getText(), pref);
+    return rDto;
+  }
   
   /*
    * ButtonListener is a private class that implements ActionListener. It tells the button what action to perform when clicked
@@ -174,9 +189,15 @@ public class InputScreen extends JPanel implements Screen {
       if (event.getSource() == searchButton) {
         //if the FROM or TO field is empty, show the error message, otherwise, switch screen
         if (!validate(from) || !validate(to)) {
+          errorLabel.setText("Did you forget something?");
           errorLabel.setVisible(true);
         } else {
-          gui.switchScreen(getType());    
+          if(gui.setRouteData(createRDTO())) {
+            gui.switchScreen(getType()); 
+          } else {
+            errorLabel.setText("Where you going?");
+            errorLabel.setVisible(true);
+          }
         }
       }
     }
