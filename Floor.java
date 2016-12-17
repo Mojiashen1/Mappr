@@ -79,4 +79,18 @@ public class Floor {
     matrix.addEdge(r1, r2, distance);
   }
   
+  public Room findRoomByName(String name) {
+    LinkedList<Room> rooms = getRooms();
+    String searchName = name.toLowerCase().trim();
+    String compareName;
+
+    for(Room r : rooms) {
+      compareName = r.getName().toLowerCase().trim();
+      if(compareName.equals(searchName)) {
+        return r;
+      }
+    }
+
+    return null;
+  }
 }

@@ -2,6 +2,8 @@ import java.util.LinkedList;
 import java.util.HashMap;
 import javafoundations.LinkedQueue;
 import javafoundations.Queue;
+import java.util.Scanner;
+import java.io.*;
 
 public class Building {
   private String name;
@@ -12,6 +14,11 @@ public class Building {
     this.name = name;
     this.elevators = new HashMap<String, LinkedList<Floor>>();
     this.floors = new LinkedList<Floor>();
+  }
+
+  public Building(String name, String fileName) {
+    this(name);
+    readFromTextFile(fileName);
   }
   
   public void addFloor(Floor f){
@@ -151,15 +158,17 @@ public class Building {
       Queue<Room> combinedPath;
 
       for(Elevator e : connections) {
-        fl1Path = fl1.traverseFloor(r1, e);
-        fl2Path = fl2.traverseFloor(e, r2);
+        fl1Path = fl1.traverseFloor(r1, fl1.findRoomByName(e.getName()));
+        fl2Path = fl2.traverseFloor(fl2.findRoomByName(e.getName()), r2);
 
-        combinedWeight = fl1Path.getWeight() + fl2Path.getWeight();
-        combinedPath = combineQueues(fl1Path.getPath(), fl2Path.getPath());
+        if(fl1Path != null && fl2Path != null) {
+          combinedWeight = fl1Path.getWeight() + fl2Path.getWeight();
+          combinedPath = combineQueues(fl1Path.getPath(), fl2Path.getPath());
 
-        if(combinedWeight < minDistance) {
-          minPath = new WeightedPath(combinedPath, combinedWeight);
-          minDistance = combinedWeight;
+          if(combinedWeight < minDistance) {
+            minPath = new WeightedPath(combinedPath, combinedWeight);
+            minDistance = combinedWeight;
+          }
         }
       }
 
@@ -204,6 +213,128 @@ public class Building {
   public boolean isConnected (Floor f1, Floor f2) {
     return getElevatorsBetweenFloors(f1, f2).size() > 0;
   }
+
+  public boolean isConnected(int f1, int f2) {
+    return getElevatorsBetweenFloors(getFloorByNumber(f1), getFloorByNumber(f2)).size() > 0;
+  }
+
+  public Room findRoomByName(String name) {
+    Room room = null;
+
+    for(Floor f : floors) {
+      room = f.findRoomByName(name);
+
+      if(room != null) {
+        return room;
+      }
+    }
+
+    return room;
+  }
+
+  private void readFromTextFile(String fileName) {
+    try {
+      LinkedList<Room> rooms = new LinkedList<Room>();
+      LinkedList<Floor> floors = new LinkedList<Floor>();
+
+      boolean collectingRooms = true;
+
+      File inFile = new File(fileName);
+      Scanner input = new Scanner(inFile); 
+
+      String[] tokens;
+
+      while(input.hasNextLine()) {
+        tokens = input.nextLine().split("\\s+");
+        if(collectingRooms) {
+          if(tokens.length > 1) {
+            if(Boolean.valueOf(tokens[2])) {
+              rooms.add(new Elevator(tokens[0], Integer.parseInt(tokens[1])));
+            } else {
+              rooms.add(new Room(tokens[0], Integer.parseInt(tokens[1])));
+            }
+          } else {
+            collectingRooms = false;
+            createFloors(rooms);
+            continue;
+          }
+        } else {
+          createConnections(tokens);
+        }
+      }
+
+    } catch(IOException e) {
+      System.out.println("Error occurred");
+      return;
+    }
+    
+    System.out.println("Successfully created building");
+  }
+
+  private void createFloors(LinkedList<Room> rooms) {
+    LinkedList<Floor> floorsToAdd = new LinkedList<Floor>();
+    Floor fa;
+
+    for(Room r : rooms) {
+      fa = findByNumber(floorsToAdd, r.getFloor());
+      if(fa != null) {
+        fa.addRoom(r);
+      } else {
+        floorsToAdd.add(new Floor(r.getFloor()));
+        fa = findByNumber(floorsToAdd, r.getFloor());
+        fa.addRoom(r);
+      }
+    }
+
+    for(Floor f : floorsToAdd) {
+      addFloor(f);
+    }
+  }
+
+  private Floor findByNumber(LinkedList<Floor> floorsToAdd, int number) {
+    Floor f = null;
+
+    for(Floor fs : floorsToAdd) {
+      if(fs.getFloor() == number) {
+        return fs;
+      }
+    }
+
+    return f;
+  }
+
+  private void createConnections(String[] tokens) {
+    Floor f = f = getFloorByNumber(Integer.parseInt(tokens[1]));
+    Room r = findRoomByName(tokens[0]), connect;
+
+    if(!tokens[2].equals("none")) {
+      connect = f.findRoomByName(tokens[2]);
+      r.setNorth(connect);
+      
+      f.connectRooms(r, connect, Integer.parseInt(tokens[3]));
+    }
+
+    if(!tokens[4].equals("none")) {
+      connect = f.findRoomByName(tokens[4]);
+      r.setEast(connect);
+
+      f.connectRooms(r, connect, Integer.parseInt(tokens[5]));
+    }
+
+    if(!tokens[6].equals("none")) {
+      connect = f.findRoomByName(tokens[6]);
+      r.setSouth(connect);
+
+      f.connectRooms(r, connect, Integer.parseInt(tokens[7]));
+    }
+
+    if(!tokens[8].equals("none")) {
+      connect = f.findRoomByName(tokens[8]);
+      r.setWest(connect);
+
+      f.connectRooms(r, connect, Integer.parseInt(tokens[9]));
+    }
+  }
   
   //setters 
   public void setName(String name) {
@@ -245,9 +376,21 @@ public class Building {
     building.addFloor(floor2);
     building.addFloor(floor3);
 
+    Room searchOne = building.findRoomByName("Science Room");
+    Room searchTwo = building.findRoomByName("Music Room");
+
     System.out.println("Floors 1 & 2 are connected: " + building.isConnected(floor1, floor2));
     System.out.println("Floors 1 & 3 are directly connected: " + building.isConnected(floor1, floor3));
     System.out.println("Path between Room1 and Elevator1 on Floor1: " + building.traverseBuilding(room1, elevator1));
     System.out.println("Path between Room1 and Room 4: " + building.traverseBuilding(room1, room4));
+    System.out.println("Searching by name: " + building.traverseBuilding(searchOne, searchTwo));
+
+    Building academicBuilding = new Building("Science Center", "create.mappr");
+
+    Room s1 = academicBuilding.findRoomByName("RM100");
+    Room s2 = academicBuilding.findRoomByName("RM202");
+
+    System.out.println("Floors 1 & 2 are connected: " + academicBuilding.isConnected(1, 2));
+    System.out.println("Path from Room 100 to Room 202: " + academicBuilding.traverseBuilding(s1, s2));
   }
 }
