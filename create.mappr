@@ -2,16 +2,20 @@ RM100 1 false
 RM101 1 false
 RM102 1 false
 EL1 1 true
+EL2 1 true
 RM200 2 false
 RM201 2 false
 RM202 2 false
+EL2 2 true
 EL1 2 true
 
-RM100 1 none none RM101 5 none none EL1 3
+RM100 1 none none RM101 5 EL2 1 EL1 3
 RM101 1 none none none none none none RM100 5
-RM102 1 none none none none EL1 2 none none
-EL1 1 RM102 2 RM100 3 none none none none
-RM200 2 RM201 2 none none RM202 2 none none
-RM201 2 EL1 2 none none RM200 2 none none
+RM102 1 none none none none EL1 1 none none
+EL1 1 RM102 1 RM100 3 none none none none
+EL2 1 RM100 1 none none none none none none
+RM200 2 RM201 17 EL2 1 RM202 2 none none
+RM201 2 EL1 1 none none RM200 17 none none
 RM202 2 none none RM200 2 none none none none
-EL1 2 none none none none RM201 2 none none 
+EL1 2 none none none none RM201 1 none none 
+EL2 2 none none none none none none RM200 1

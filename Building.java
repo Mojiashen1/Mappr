@@ -10,17 +10,23 @@ public class Building {
   private HashMap<String, LinkedList<Floor>> elevators;
   private LinkedList<Floor> floors;
   
+  // Constructor
   public Building (String name) {
     this.name = name;
     this.elevators = new HashMap<String, LinkedList<Floor>>();
     this.floors = new LinkedList<Floor>();
   }
 
+  // Constructor
   public Building(String name, String fileName) {
     this(name);
     readFromTextFile(fileName);
   }
   
+  /*
+  * Adds a floor to the building and connects it to the rest of
+  * the floors
+  */
   public void addFloor(Floor f){
     if(!floors.contains(f)) {
       floors.add(f);
@@ -28,6 +34,10 @@ public class Building {
     }
   }
   
+  /*
+  * Connects the floors by adding to a hashmap
+  * of elevator names. This is an adjancey list
+  */
   private void connectFloor(Floor f) {
       LinkedList<Elevator> elevatorsOnFloor = getElevatorsOnFloor(f);
       LinkedList<Floor> connection;
@@ -46,6 +56,9 @@ public class Building {
       }
   }
 
+  /*
+  * Returns all of the elevators that connect two floors
+  */
   private LinkedList<Elevator> getElevatorsBetweenFloors(Floor f1, Floor f2) {
     LinkedList<Elevator> connections = new LinkedList<Elevator>();
 
@@ -67,6 +80,9 @@ public class Building {
     return connections;
   }
 
+  /*
+  * Returns all of the elevators on a given floor
+  */
   private LinkedList<Elevator> getElevatorsOnFloor(Floor f) {
     LinkedList<Elevator> elevatorsOnFloor = new LinkedList<Elevator>();
 
@@ -79,6 +95,9 @@ public class Building {
     return elevatorsOnFloor;
   }
 
+  /*
+  * Returns all of the floors connected by a given elevator
+  */
   private LinkedList<Integer> getFloorsForElevator(Elevator e) {
     LinkedList<Integer> elevatorFloors = new LinkedList<Integer>();
     LinkedList<Floor> floorsForElevator = elevators.get(e.getName());
@@ -90,6 +109,10 @@ public class Building {
     return elevatorFloors;
   }
 
+  /*
+  * Returns the value in a linked list of integers that gives the minimum difference
+  * between the floor number
+  */
   private int minDifference(LinkedList<Integer> elevatorFloors, int floor2) {
     int minDistance = Integer.MAX_VALUE;
     int minNum = -1;
@@ -104,10 +127,30 @@ public class Building {
     return minNum;
   }
   
+  /*
+  * Returns whether or not two rooms are on the same floor
+  */
   public boolean sameFloor(Room r1, Room r2){
     return r1.getFloor() == r2.getFloor();
   }
+
+  /*
+  * Returns the shortest route between two rooms given their names
+  */
+  public Queue<Room> traverseBuilding(String r1, String r2) {
+    Room room1 = findRoomByName(r1);
+    Room room2 = findRoomByName(r2);
+
+    if(room1 != null && room2 != null) {
+      return traverseBuilding(r1, r2);
+    }
+
+    return new LinkedQueue<Room>();
+  }
   
+  /*
+  * Returns the shortest path between two rooms
+  */
   public Queue<Room> traverseBuilding(Room r1, Room r2){
     Queue<Room> traversal = new LinkedQueue<Room>();
 
@@ -181,6 +224,9 @@ public class Building {
     return traversal;
   }
 
+  /*
+  * Returns the combination of two queues
+  */
   private Queue<Room> combineQueues(Queue<Room> queue1, Queue<Room> queue2) {
     int stop = queue2.size();
     queue2.dequeue();
@@ -191,6 +237,9 @@ public class Building {
     return queue1;
   }
 
+  /*
+  * Returns a floor given its number
+  */
   private Floor getFloorByNumber(int floorNumber) {
     for(Floor f : floors) {
       if(f.getFloor() == floorNumber) {
@@ -218,6 +267,9 @@ public class Building {
     return getElevatorsBetweenFloors(getFloorByNumber(f1), getFloorByNumber(f2)).size() > 0;
   }
 
+  /*
+  * Returns a room given its name, searches across all floors
+  */
   public Room findRoomByName(String name) {
     Room room = null;
 
@@ -232,6 +284,9 @@ public class Building {
     return room;
   }
 
+  /*
+  * Reads in a building from a text file
+  */
   private void readFromTextFile(String fileName) {
     try {
       LinkedList<Room> rooms = new LinkedList<Room>();
@@ -271,6 +326,9 @@ public class Building {
     System.out.println("Successfully created building");
   }
 
+  /*
+  * Creates all of the floors for a building
+  */
   private void createFloors(LinkedList<Room> rooms) {
     LinkedList<Floor> floorsToAdd = new LinkedList<Floor>();
     Floor fa;
@@ -291,6 +349,9 @@ public class Building {
     }
   }
 
+  /*
+  * Finds a floor number from a list of floors
+  */
   private Floor findByNumber(LinkedList<Floor> floorsToAdd, int number) {
     Floor f = null;
 
@@ -303,6 +364,9 @@ public class Building {
     return f;
   }
 
+  /*
+  * Creates all of the connections between the rooms
+  */
   private void createConnections(String[] tokens) {
     Floor f = f = getFloorByNumber(Integer.parseInt(tokens[1]));
     Room r = findRoomByName(tokens[0]), connect;
@@ -388,7 +452,7 @@ public class Building {
     Building academicBuilding = new Building("Science Center", "create.mappr");
 
     Room s1 = academicBuilding.findRoomByName("RM100");
-    Room s2 = academicBuilding.findRoomByName("RM202");
+    Room s2 = academicBuilding.findRoomByName("RM201");
 
     System.out.println("Floors 1 & 2 are connected: " + academicBuilding.isConnected(1, 2));
     System.out.println("Path from Room 100 to Room 202: " + academicBuilding.traverseBuilding(s1, s2));
