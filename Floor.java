@@ -7,6 +7,7 @@
 import javafoundations.LinkedQueue;
 import javafoundations.Queue;
 import java.util.LinkedList;
+import java.util.Iterator;
 
 public class Floor {
   private int n; //the number of the floor
@@ -33,7 +34,7 @@ public class Floor {
   
   public boolean exist(Room room) {
     //if the room is not found, getVertex returns -1
-    return matrix.getVertex(room) > 0;
+    return matrix.isVertex(room);
   }
   
   //getters
@@ -42,11 +43,11 @@ public class Floor {
   }
   
   public int getDistance(Room r1, Room r2){
-    return matrix.getEdge(r1, r2);
+    return matrix.getEdgeWeight(r1, r2);
   }
   
   public boolean isAdjacent(Room r1, Room r2) {
-    return matrix.getEdge(r1, r2) > 0;
+    return matrix.getEdgeWeight(r1, r2) >= 0;
   }
   
   // returns a linkedlist of all rooms

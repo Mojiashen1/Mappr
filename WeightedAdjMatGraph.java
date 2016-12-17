@@ -74,6 +74,13 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
     }
     return false;
   }
+
+  /**
+   * Returns true if a vertex exists
+   */
+  public boolean isVertex(T vertex) {
+    return vertexIndex(vertex) != -1;
+  }
   
   /** 
    * Returns weight of edge if it exists. If it does not,
