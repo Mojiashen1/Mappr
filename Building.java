@@ -174,8 +174,6 @@ public class Building {
       } else {
         floor2 = minDifference(elevatorFloors, floor1);
       }
-    } else {
-       // *** What Happens if They're Both Elevators ***
     }
 
     if (floor1 == floor2){
@@ -452,7 +450,7 @@ public class Building {
     Building academicBuilding = new Building("Science Center", "create.mappr");
 
     Room s1 = academicBuilding.findRoomByName("RM100");
-    Room s2 = academicBuilding.findRoomByName("RM201");
+    Room s2 = academicBuilding.findRoomByName("RM202");
 
     System.out.println("Floors 1 & 2 are connected: " + academicBuilding.isConnected(1, 2));
     System.out.println("Path from Room 100 to Room 202: " + academicBuilding.traverseBuilding(s1, s2));
