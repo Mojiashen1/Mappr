@@ -1,516 +1,447 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-
 /**
- * DO NOT CHANGE THIS FILE.
+ * Clarissa Verish
+ * 12/11/2016
+ * WeightedAdjMatGraph.java
  * 
- * A basic Adjacency Matrix graph implementation.  Carefully consider
- * which methods and instance variables you can use from AdjMatGraphPlus.
+ * Purpose: to be able to build an adjacency matrix that stores the data for 
+ * weighted edges. The graph will be undirected when constructed.
  */
-public class AdjMatGraph<T> implements Graph<T>, Iterable<T> {
- public static final int NOT_FOUND = -1;
- private static final int DEFAULT_CAPACITY = 1; // Small so that we can test expand
- private static final boolean VERBOSE = false;  // print while reading TGF?
 
- private int n;   // number of vertices in the graph
- private boolean[][] arcs;   // adjacency matrix of arcs
- private T[] vertices;   // values of vertices
+import java.util.LinkedList;
+import javafoundations.ArrayIterator;
+import java.lang.Iterable;
+import java.util.Iterator;
+import javafoundations.LinkedStack;
+import javafoundations.ArrayQueue;
 
- /******************************************************************
-    Constructor. Creates an empty graph.
-  ******************************************************************/
- @SuppressWarnings("unchecked")
- public AdjMatGraph() {
-  n = 0;
-  this.arcs = new boolean[DEFAULT_CAPACITY][DEFAULT_CAPACITY];
-  this.vertices = (T[])(new Object[DEFAULT_CAPACITY]);
- }
- 
- 
- /********** NEW METHODS *******************************************/
-
- /**
-  * Construct a copy (clone) of a given graph.
-  * The new graph will have all the same vertices and arcs as the original.
-  * A *shallow* copy is performed: the graph structure is copied, but
-  * the new graph will refer to the exact same vertex objects as the original.
-  */
- @SuppressWarnings("unchecked")
- public AdjMatGraph(AdjMatGraph<T> g) {
-  n = g.n;
-  vertices = (T[]) new Object[g.vertices.length];
-  arcs = new boolean[g.arcs.length][g.arcs.length];
-  for (int i = 0; i < n; i++) {
-   vertices[i] = g.vertices[i];
-   for (int j = 0; j < n; j++) {
-    arcs[i][j] = g.arcs[i][j];
-   }
-  }
- }
-
- /******************************************************************
-  * Load vertices and edges from a TGF file into a given graph.
-  * @param tgfFile - name of the TGF file to read
-  * @param g - graph to which vertices and arcs will be added.
-  *            g must be empty to start!
-  * @throws FileNotFoundException 
-  *****************************************************************/
- public static void loadTGF(String tgf_file_name, AdjMatGraph<String> g) throws FileNotFoundException {
-  if (!g.isEmpty()) throw new RuntimeException("Refusing to load TGF data into non-empty graph.");
-  Scanner fileReader = new Scanner(new File(tgf_file_name));
-  // Keep a mapping from TGF vertex ID to AdjMatGraph vertex ID.
-  // This allows vertex IDs to be written out of order in TGF.
-  // It also supports non-integer vertex IDs.
-  HashMap<String,Integer> vidMap = new HashMap<String,Integer>();
-  try {
-   // Read vertices until #
-   while (fileReader.hasNext()) {
-    // Get TGF vertex ID
-    String nextToken = fileReader.next();
-    if (nextToken.equals("#")) {
-     break;
-    }
-    vidMap.put(nextToken, g.n());
-    String label = fileReader.hasNextLine() ? fileReader.nextLine().trim() : fileReader.next();
-    if (VERBOSE) {
-     System.out.println("Adding vertex " + g.n() + " (" + nextToken + " = \"" + label + "\")");
-    }
-    g.addVertex(label);
-   }
-
-   // Read edges until EOF
-   while (fileReader.hasNext()) {
-    // Get src and dest
-    String src = fileReader.next();
-    String dest = fileReader.next();
-    // Discard label if any
-    if (fileReader.hasNextLine()) {
-     String label = fileReader.nextLine().trim();
-     if (!label.isEmpty()) System.out.println("Discarded arc label: \"" + label + "\"");
-    }
-
-    if (VERBOSE) {
-     System.out.println(
-       "Adding arc "
-         + vidMap.get(src)  + " (" + src  + " = \"" + g.getVertex(vidMap.get(src))  + "\") --> "
-         + vidMap.get(dest) + " (" + dest + " = \"" + g.getVertex(vidMap.get(dest)) + "\")"
-       );
-    }
-    g.addArc(vidMap.get(src), vidMap.get(dest));
-   }
-  } catch (RuntimeException e) {
-   System.out.println("Error reading TGF");
-   throw e;
-  } finally {
-   fileReader.close();
-  }
-
- }
- 
- /**
-  * An iterator that iterates over the vertices of an AdjMatGraph.
-  */
- private class VerticesIterator implements Iterator<T> {
-  private int cursor = 0;
+public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
+  public static final int NOT_FOUND = -1;
+  private static final int DEFAULT_CAPACITY = 100; // fairly large to account for building
   
-  /** Check if the iterator has a next vertex */
-  public boolean hasNext() {
-   return cursor < n;
-  }
-
-  /** Get the next vertex. */
-  public T next() {
-   if (cursor >= n) {
-    throw new NoSuchElementException();
-   } else {
-    return vertices[cursor++];
-   }
-  }
-
-  /** Remove is not supported in this iterator. */
-  public void remove() {
-   throw new UnsupportedOperationException();
-  } 
- }
- 
- /**
-  * Create a new iterator that will iterate over the vertices of the array when asked.
-  * @return the new iterator.
-  */
- public Iterator<T> iterator() {
-  return new VerticesIterator();
- }
- 
- /**
-  * Check if the graph contains the given vertex.
-  */
- public boolean containsVertex(T vertex) {
-  return getIndex(vertex) != NOT_FOUND;
- }
- 
- 
- 
- 
- /**** FAMILIAR METHODS ********************************************/
- 
- 
- 
-
- /******************************************************************
-    Returns true if the graph is empty and false otherwise. 
-  ******************************************************************/
- public boolean isEmpty() {
-  return n == 0;
- }
-
- /******************************************************************
-    Returns the number of vertices in the graph.
-  ******************************************************************/
- public int n() {
-  return n;
- }
-
- /******************************************************************
-    Returns the number of arcs in the graph by counting them.
-  ******************************************************************/
- public int m() {
-  int total = 0;
-
-  for (int i = 0; i < n; i++) {
-   for (int j = 0; j < n; j++) {
-    if (arcs[i][j]) {
-     total++;
-    }
-   }
-  }
-  return total; 
- }
-
- /******************************************************************
-    Returns true iff a directed edge exists from v1 to v2.
-  ******************************************************************/
- public boolean isArc(T srcVertex, T destVertex) {
-  int src = getIndex(srcVertex);
-  int dest = getIndex(destVertex);
-  return src != NOT_FOUND && dest != NOT_FOUND && arcs[src][dest];
- }
-
-
- /******************************************************************
-    Returns true iff an arc exists between two given indices. 
-    @throws IllegalArgumentException if either index is invalid.
-  ******************************************************************/
- protected boolean isArc(int srcIndex, int destIndex) {
-  if (!indexIsValid(srcIndex) || !indexIsValid(destIndex)) {
-   throw new IllegalArgumentException("One or more invalid indices: " + srcIndex + ", " + destIndex);
-  }
-  return arcs[srcIndex][destIndex];
- }
-
-
- /******************************************************************
-    Returns true iff an edge exists between two given vertices
-    which means that two corresponding arcs exist in the graph.
-  ******************************************************************/
- public boolean isEdge(T srcVertex, T destVertex) {
-  int src = getIndex(srcVertex);
-  int dest = getIndex(destVertex);
-  return src != NOT_FOUND && dest != NOT_FOUND && isArc(src, dest) && isArc(dest, src);
- }
-
-
- /******************************************************************
-    Returns true IFF the graph is undirected, that is, for every 
-    pair of nodes i,j for which there is an arc, the opposite arc
-    is also present in the graph.  
-  ******************************************************************/
- public boolean isUndirected() {
-  for (int i = 1; i < n(); i++) {
-   // optimize to avoid checking pairs twice.
-   for (int j = 0; j < i; j++) {
-    if (arcs[i][j] != arcs[j][i]) {
-     return false;
-    }
-   }
-  }
-  return true;
- }
-
-
- /******************************************************************
-    Adds a vertex to the graph, expanding the capacity of the graph
-    if necessary.  If the vertex already exists, it does not add it again.
-  ******************************************************************/
- public void addVertex (T vertex) {
-  if (getIndex(vertex) != NOT_FOUND) return;
-  if (n == vertices.length) {
-   expandCapacity();
-  }
-
-  vertices[n] = vertex;
-  for (int i = 0; i <= n; i++) {
-//   if (arcs[n][i] || arcs[i][n]) throw new RuntimeException("Corrupted AdjacencyMatrix");
-   arcs[n][i] = false;
-   arcs[i][n] = false;
-  }      
-  n++;
- }
-
- /******************************************************************
-    Helper. Creates new arrays to store the contents of the graph 
-    with twice the capacity.
-  ******************************************************************/
- @SuppressWarnings("unchecked")
- private void expandCapacity() {
-  T[] largerVertices = (T[])(new Object[vertices.length*2]);
-  boolean[][] largerAdjMatrix = 
-    new boolean[vertices.length*2][vertices.length*2];
-
-  for (int i = 0; i < n; i++) {
-   for (int j = 0; j < n; j++) {
-    largerAdjMatrix[i][j] = arcs[i][j];
-   }
-   largerVertices[i] = vertices[i];
-  }
-
-  vertices = largerVertices;
-  arcs = largerAdjMatrix;
- }
-
-
- /******************************************************************
-    Removes a single vertex with the given value from the graph.  
-    Uses equals() for testing equality.
-  ******************************************************************/
- public void removeVertex (T vertex) {
-  int index = getIndex(vertex);
-  if (index != NOT_FOUND) {
-   removeVertex(index);
-  }
- }
-
- /******************************************************************
-    Helper. Removes a vertex at the given index from the graph.   
-    Note that this may affect the index values of other vertices.
-    @throws IllegalArgumentException if the index is invalid.
-  ******************************************************************/
- protected void removeVertex (int index) {
-  if (!indexIsValid(index)) {
-   throw new IllegalArgumentException("No such vertex index");
-  }
-  n--;
-
-  // Remove vertex.
-  for (int i = index; i < n; i++) {
-   vertices[i] = vertices[i+1];
-  }
-
-  // Move rows up.
-  for (int i = index; i < n; i++) {
-   for (int j = 0; j <= n; j++) {
-    arcs[i][j] = arcs[i+1][j];
-   }
-  }
-
-  // Move columns left
-  for (int i = index; i < n; i++) {
-   for (int j = 0; j < n; j++) {
-    arcs[j][i] = arcs[j][i+1];
-   }
+  private int[][] edges; // storage for the integer weights of the edges
+  private int n; // num vertices
+  private T[] vertices; // vertices in graph
+  
+  // constructor
+  public WeightedAdjMatGraph(){
+    this.edges = new int[DEFAULT_CAPACITY][DEFAULT_CAPACITY];
+    this.n = 0;
+    this.vertices = (T[])(new Object[DEFAULT_CAPACITY]);
   }
   
-  // Erase last row and last column
-  for (int a = 0; a < n; a++) {
-   arcs[n][a] = false;
-   arcs[a][n] = false;
+  /***********************************
+    ******* IMPLEMENTING GRAPH *******
+    **********************************/
+
+  public boolean isEmpty(){
+    return n == 0;
   }
- }
-
- /******************************************************************
-    Inserts an edge between two vertices of the graph.
-    If one or both vertices do not exist, ignores the addition.
-  ******************************************************************/
- public void addEdge(T vertex1, T vertex2) {
-  int index1 = getIndex(vertex1);
-  int index2 = getIndex(vertex2);
-  if (index1 != NOT_FOUND && index2 != NOT_FOUND) {
-   addArc(index1, index2);
-   addArc(index2, index1);
-  }
- }
-
- /******************************************************************
-    Inserts an arc from srcVertex to destVertex.
-    If the vertices exist, else does not change the graph. 
-  ******************************************************************/
- public void addArc(T srcVertex, T destVertex) {
-  int src = getIndex(srcVertex);
-  int dest = getIndex(destVertex);
-  if (src != NOT_FOUND && dest != NOT_FOUND) {
-   addArc(src, dest);
-  }
- }
-
- /******************************************************************
-    Helper. Inserts an edge between two vertices of the graph.
-    @throws IllegalArgumentException if either index is invalid.
-  ******************************************************************/
- protected void addArc(int srcIndex, int destIndex) {
-  if (!indexIsValid(srcIndex) || !indexIsValid(destIndex)) {
-   throw new IllegalArgumentException("One or more invalid indices: " + srcIndex + ", " + destIndex);
-  }
-  arcs[srcIndex][destIndex] = true;
- }
-
-
- /******************************************************************
-    Removes an edge between two vertices of the graph.
-    If one or both vertices do not exist, ignores the removal.
-  ******************************************************************/
- public void removeEdge(T vertex1, T vertex2) {
-  int index1 = getIndex(vertex1);
-  int index2 = getIndex(vertex2);
-  if (index1 != NOT_FOUND && index2 != NOT_FOUND) {
-   removeArc(index1, index2);
-   removeArc(index2, index1);
-  }
- }
-
-
- /******************************************************************
-    Removes an arc from vertex src to vertex dest,
-    if the vertices exist, else does not change the graph. 
-  ******************************************************************/
- public void removeArc(T srcVertex, T destVertex) {
-  int src = getIndex(srcVertex);
-  int dest = getIndex(destVertex);
-  if (src != NOT_FOUND && dest != NOT_FOUND) {
-   removeArc(src, dest);
-  }
- }
-
- /******************************************************************
-    Helper. Removes an arc from index v1 to index v2.
-    @throws IllegalArgumentException if either index is invalid.
-  ******************************************************************/
- protected void removeArc(int srcIndex, int destIndex) {
-  if (!indexIsValid(srcIndex) || !indexIsValid(destIndex)) {
-   throw new IllegalArgumentException("One or more invalid indices: " + srcIndex + ", " + destIndex);
-  }
-  arcs[srcIndex][destIndex] = false;
- }
-
-
-
- /******************************************************************
-    Returns the index value of the first occurrence of the vertex.
-    Returns NOT_FOUND if the key is not found.
-  ******************************************************************/
- protected int getIndex(T vertex) {
-  for (int i = 0; i < n; i++) {
-   if (vertices[i].equals(vertex)) {
-    return i;
-   }
-  }
-  return NOT_FOUND;
- }
-
- /******************************************************************
-    Returns the vertex object that is at a certain index
-  ******************************************************************/
- protected T getVertex(int v) {
-  if (!indexIsValid(v)) {
-   throw new IllegalArgumentException("No such vertex index: " + v);
-  }
-  return vertices[v]; 
- }
-
- /******************************************************************
-     Returns true if the given index is valid. 
-  ******************************************************************/
- protected boolean indexIsValid(int index) {
-  return index < n && index >= 0;  
- }
-
- /******************************************************************
-    Retrieve from a graph the vertices x pointing to vertex v (x->v)
-    and returns them onto a linked list
-  ******************************************************************/
- public LinkedList<T> getPredecessors(T vertex) {
-  LinkedList<T> neighbors = new LinkedList<T>();
-
-  int v = getIndex(vertex); 
-
-  if (v == NOT_FOUND) return neighbors;
-  for (int i = 0; i < n; i++) {
-   if (arcs[i][v]) {
-    neighbors.add(getVertex(i)); // if T then add i to linked list
-   }
-  }    
-  return neighbors;    
- }
-
- /******************************************************************
-  * Retrieve from a graph the vertices x following vertex v (v->x)
-    and returns them onto a linked list
-  ******************************************************************/
- public LinkedList<T> getSuccessors(T vertex){
-  LinkedList<T> neighbors = new LinkedList<T>();
-
-  int v = getIndex(vertex); 
-
-  if (v == NOT_FOUND) return neighbors;
-  for (int i = 0; i < n; i++) {
-   if (arcs[v][i]) {
-    neighbors.add(getVertex(i)); // if T then add i to linked list
-   }
-  }    
-  return neighbors;    
- }
-
- /******************************************************************
-    Returns a string representation of the graph. 
-  ******************************************************************/
- public String toString() {
-  if (n == 0) {
-   return "Graph is empty";
-  }
-
-  String result = "";
-
-  //result += "\nArcs\n";
-  //result += "---------\n";
-  result += "\ni ";
-
-  for (int i = 0; i < n; i++) {
-   result += "" + getVertex(i);
-   if (i < 10) {
-    result += " ";
-   }
-  }
-  result += "\n";
-
-  for (int i = 0; i < n; i++) {
-   result += "" + getVertex(i) + " ";
-
-   for (int j = 0; j < n; j++) {
-    if (arcs[i][j]) {
-     result += "1 ";
-    } else {
-     result += "- "; //just empty space
+  
+  /**
+   * Returns number of vertices in graph.
+   */
+  public int n(){
+    return n;
+  };
+  
+  /**
+   * Returns number of edges in the graph.
+   * Counts number of arcs in adjacency matrix, then divides
+   * by two since graph is undirected.
+   */
+  public int m(){
+    int m = 0;
+    // looping through adj matrix to check if edge.
+    // increments counter if so.
+    for (int i = 0; i < n; i++){
+      for (int j = 0; j < n; j++){
+        if (edges[i][j] > 0){
+          m++;
+        }
+      }
     }
-   }
-   result += "\n";
+    return m / 2;
+  }
+  
+  /**
+   * Returns true if an edge exists between two vertices
+   */
+  public boolean isEdge (T vertex1, T vertex2){
+    int i1 = vertexIndex(vertex1);
+    int i2 = vertexIndex(vertex2);
+    if (i1 != NOT_FOUND && i2 != NOT_FOUND && edges[i1][i2] > 0){
+      return true;
+    }
+    return false;
+  }
+  
+  /** 
+   * Returns weight of edge if it exists. If it does not,
+   * it returns NOT_FOUND (-1)
+   */
+  public int getEdgeWeight(T vertex1, T vertex2){
+    if (isEdge(vertex1, vertex2)){
+      return edges[vertexIndex(vertex1)][vertexIndex(vertex2)];
+    }
+    return NOT_FOUND;
+  }
+  
+  /**
+   * Adds vertex if it does not already exist, and autopopulates
+   * all newly created edges between old vertices and new vertex with -1.
+   */
+  public void addVertex (T vertex){
+    if (vertexIndex(vertex) > 0) return; // vertex already in graph, return.
+    if (n == vertices.length){ // need to expand capacity of arrays
+      expandCapacity();
+    }
+    
+    vertices[n] = vertex;
+    for (int i = 0; i < n; i++){ // populating new edges with -1
+      edges[n][i] = -1;
+      edges[i][n] = -1;
+    }
+    n++;
+  }
+  
+  /**
+   * Removes the given vertex if possible.
+   */
+  public void removeVertex (T vertex){
+    int index = vertexIndex(vertex);
+    
+    if (index < 0) return; // vertex does not exist
+    
+    n--;
+    // IF THIS DOESN'T WORK make separate loop for column moving
+    for (int i = index; i < n; i++){
+      vertices[i] = vertices[i + 1];
+      for (int j = 0; j < n; j++){
+        edges[j][i] = edges[j][i + 1]; // moving row up
+        edges[i] = edges[i + 1]; // moving column over
+      }
+    }
+  }
+  
+  public void addEdge (T vertex1, T vertex2, int weight){
+    int i1 = vertexIndex(vertex1);
+    int i2 = vertexIndex(vertex2);
+    
+    if (i1 == NOT_FOUND || i2 == NOT_FOUND) return;
+    
+    edges[i1][i2] = weight;
+    edges[i2][i1] = weight;
+  }
+  
+  public void removeEdge (T vertex1, T vertex2){
+    int i1 = vertexIndex(vertex1);
+    int i2 = vertexIndex(vertex2);
+    
+    if (i1 == NOT_FOUND || i2 == NOT_FOUND) return;
+    
+    edges[i1][i2] = -1;
+    edges[i2][i1] = -1;
+  }
+  
+  public LinkedList<T> getNeighbors(T vertex){
+    LinkedList<T> neighbors = new LinkedList<T>();
+    int index = vertexIndex(vertex);
+    
+    for (int i = 0; i < n; i++){
+      if (edges[index][i] > 0){
+        neighbors.add(vertices[i]);
+      }
+    }
+    return neighbors;
+  }
+  
+  /** Returns the shortest path traveled between two vertices on 
+    * a graph as a LinkedQueue */
+  public ArrayQueue<T> getShortestPath(T vertex1, T vertex2){
+    DijkstraShortestPath p = new DijkstraShortestPath(vertex1, vertex2);
+    return p.getMinPath();
+  }
+  
+  /** Returns the shortest distance between two vertices on a graph */
+  public int getShortestDistance(T vertex1, T vertex2){
+    DijkstraShortestPath p = new DijkstraShortestPath(vertex1, vertex2);
+    return p.getMinDistance();
+  }
+  
+
+  /** Returns a string representation of the adjacency matrix. */
+  public String toString(){
+    String s = "";
+    s += "\t";
+    
+    for (int i = 0; i < n; i++){
+      // adding vertices for columns
+      s += vertices[i] + "\t";
+    }
+    
+    s += "\n";
+    
+    for (int i = 0; i < n; i++){
+      s += vertices[i] + "\t"; // vertex for row
+      for (int j = 0; j < n; j++){
+        s += edges[j][i] + "\t"; // adding edges across row
+      }
+      s += "\n";
+    }
+    
+    return s;
+  }
+  
+  /***********************************
+    ***** IMPLEMENTING ITERABLE ******
+    **********************************/
+  
+  public Iterator<T> iterator(){
+    ArrayIterator<T> iter = new ArrayIterator<T>();
+    for (int i = 0; i < n; i++){
+      iter.add(vertices[i]);
+    }
+    return (Iterator<T>)(iter);
+  }
+  
+
+  
+  
+
+  
+  /***********************************
+    ***** DIJKSTRA SHORTEST PATH *****
+    **********************************/
+  
+  /**
+   * computes the shortest path to traverse graph using Dijkstra's algorithm.
+   * - all nodes start in unvisited linkedlist, and the distances from all nodes
+   *   to the start node is stored in an array and start at infinity. 
+   * - the start node is added to the visited, removed from unvisited, node's
+   *   distance is set to zero, and node is set as current node
+   * - find all neighbors of current node - if neighbor hasn't been visited, find
+   *   (distance from current node to start) + (edge weight from current to neighbor)
+   * - if distance for neighbor is less than already-stored distance, change to this
+   *   distance
+   * - after looking at all neighbors, set unvisited neighbor with shortest distance to 
+   *   start equal to the current node, and repeat
+   */
+  
+  private class DijkstraShortestPath {
+    private T start, end; // starting and ending vertices
+    private int totalDistance;
+    private int[] distances; // distance from start 
+    private T[] closestPredecessor; // closest predecessor for each node (null if start node)
+    private LinkedList<T> visited, unvisited; // visited and unvisited vertices
+    private ArrayQueue<T> path; // shortest path
+
+    
+    
+    public DijkstraShortestPath(T start, T end){
+      this.start = start;
+      this.end = end;
+      visited = new LinkedList<T>();
+      unvisited = new LinkedList<T>();
+      distances = new int[n];
+      path = new ArrayQueue<T>();
+      closestPredecessor = (T[])(new Object[n]);
+      
+      for (int i = 0; i < n; i++){ 
+        distances[i] = Integer.MAX_VALUE; // setting distances to infinity
+        unvisited.add(vertices[i]); // adding all vertices to unvisited
+      }
+      // setting start index as visited
+      visited.add(start);
+      unvisited.remove(start);
+      distances[vertexIndex(start)] = 0;
+      computeShortestPath();
+      
+    }
+    
+    /**
+     * returns a queue of the minimum path produced
+     */
+    public ArrayQueue<T> getMinPath(){
+      return path;
+    }
+    
+    /**
+     * returns the minimum distance from start to end
+     */
+    public int getMinDistance(){
+      return totalDistance;
+    }
+    
+    
+    
+    // computes the shortest path using Dijkstra's algorithm.
+    // does not return anything.
+    private void computeShortestPath(){
+      T current = start;
+      boolean atEnd = false;
+      while (!unvisited.isEmpty()&& !atEnd){
+        int currentIndex = vertexIndex(current);
+        LinkedList<T> neighbors = getUnvisitedNeighbors(current); // getting unvisited neighbors
+        
+        if (neighbors.isEmpty()){
+          
+        }
+        
+        // looping through to find distances from start to neighbors
+        for (T neighbor : neighbors){ 
+          int neighborIndex = vertexIndex(neighbor); 
+          int d = distances[currentIndex] + getEdgeWeight(current, neighbor);
+          
+          if (d < distances[neighborIndex]){ // if this distance is less than previous distance
+            distances[neighborIndex] = d;
+            closestPredecessor[neighborIndex] = current; // now closest predecessor is current
+          }
+        }
+        
+        if (current.equals(end)){
+          atEnd = true;
+        }
+        else{
+        // finding unvisited node that is closest to start node
+          T min = getMinUnvisited();
+          if (min != null){
+            unvisited.remove(min); // remove minimum neighbor from unvisited
+            visited.add(min); // add minimum neighbor to visited
+            current = min;
+          }
+        }
+      }
+      computePath();
+      totalDistance = distances[vertexIndex(end)];
+    }
+     
+    // returns a queue of the minimum path by following closestPredecessor
+    private void computePath(){
+      LinkedStack<T> reversePath = new LinkedStack<T>();
+      // adding end vertex to reversePath
+      T current = end; // first node is the end one
+      while (!current.equals(start)){
+        reversePath.push(current); // adding current to path
+        current = closestPredecessor[vertexIndex(current)]; // changing to closest predecessor to current
+      }
+      reversePath.push(current); // adding the start vertex
+      
+      while (!reversePath.isEmpty()){
+        path.enqueue(reversePath.pop());
+      }
+    }
+    
+    // returns a list of unvisited neighbors of the input vertex
+    private LinkedList<T> getUnvisitedNeighbors(T vertex){
+      LinkedList<T> neighbors = getNeighbors(vertex);
+      LinkedList<T> unvisitedNeighbors = new LinkedList<T>();
+      
+      for (T neighbor : neighbors){
+        if (!visited.contains(neighbor)){
+          unvisitedNeighbors.add(neighbor);
+        }
+      }
+      return unvisitedNeighbors;
+    }
+    
+    // finds the unvisited neighbor with the smallest distance from the
+    // start vertex
+    private T getMinUnvisited(){
+      if (unvisited.isEmpty()) return null;
+      T min = unvisited.get(0);
+      for (int i = 1; i < unvisited.size(); i++){
+        T temp = unvisited.get(i);
+        if (distances[vertexIndex(temp)] < distances[vertexIndex(min)]){
+          min = temp;
+        }
+      }
+      return min;
+    }
+
   }
 
-  return result;
- }
+ 
+  /***********************************
+    ******** HELPER FUNCTIONS ********
+    **********************************/
+  
+  /**
+   * finds the index of the vertex. If it does not exist,
+   * it returns -1 (NOT_FOUND). If it does, it returns the 
+   * index of the vertex
+   */
+  private int vertexIndex(T obj){
+    for (int i = 0; i < n; i++){
+      if (obj.equals(vertices[i])){
+        return i;
+      }
+    }
+    return NOT_FOUND;
+  }
+    
+  /**
+   * expands the capacity of the graph.
+   */
+  private void expandCapacity() {
+    T[] tempVertices = (T[])(new Object[vertices.length * 2]);
+    int[][] tempEdges = new int[vertices.length * 2][vertices.length * 2];
+    
+    for (int i = 0; i < n; i++) {
+      tempVertices[i] = vertices[i];
+      for (int j = 0; j < n; j++) {
+        tempEdges[i][j] = edges[i][j];
+      }
+    }
+    
+    vertices = tempVertices;
+    edges = tempEdges;
+  }  
+  
+  
+  
+  public static void main(String[] args){
+    WeightedAdjMatGraph<String> w = new WeightedAdjMatGraph<String>();
+    w.addVertex("A");
+    w.addVertex("B");
+    w.addVertex("C");
+    w.addVertex("D");
+    w.addVertex("E");
+    w.addVertex("F");
+    
+    w.addEdge("A", "B", 2);
+    w.addEdge("A", "F", 4);
+    w.addEdge("B", "C", 1);
+    w.addEdge("B", "F", 6);
+    w.addEdge("C", "F", 5);
+    w.addEdge("C", "D", 2);
+    w.addEdge("C", "E", 5);
+    w.addEdge("D", "E", 1);
 
+    
+    System.out.println(w);
+    System.out.println("num vertices: " + w.n() + "; num edges: " + w.m());
+    System.out.println("edge b/w A and C? " + w.isEdge("A", "C"));
+    System.out.println("edge b/w E and C? " + w.isEdge("E", "C"));
+    System.out.println("edge weight b/w E and C? " + w.getEdgeWeight("E", "C"));
+    System.out.println("neighbors of A: " + w.getNeighbors("A"));
+    System.out.println("shortest distance from A to D: " + w.getShortestDistance("A", "D"));
+    System.out.println("shortest path:\n" + w.getShortestPath("A", "D"));
+    System.out.println("shortest distance from E to F: " + w.getShortestDistance("E", "F"));
+    System.out.println("shortest path:\n" + w.getShortestPath("E", "F"));
+    
+    System.out.println("removing B....");
+    
+    w.removeVertex("B");
+    
+    System.out.println(w);
+    
+    System.out.println("shortest distance from A to D: " + w.getShortestDistance("A", "D"));
+    System.out.println("shortest path:\n" + w.getShortestPath("A", "D"));
+    System.out.println("shortest distance from E to F: " + w.getShortestDistance("E", "F"));
+    System.out.println("shortest path:\n" + w.getShortestPath("E", "F"));
+  }
+  
+  
+  
+  
 }
