@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import javafoundations.ArrayIterator;
 import java.lang.Iterable;
 import java.util.Iterator;
+import javafoundations.Stack;
 import javafoundations.LinkedStack;
 import javafoundations.ArrayQueue;
 
@@ -73,6 +74,13 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
       return true;
     }
     return false;
+  }
+
+  /**
+   * Returns true if a vertex exists
+   */
+  public boolean isVertex(T vertex) {
+    return vertexIndex(vertex) != -1;
   }
   
   /** 
@@ -231,7 +239,7 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
     private T start, end; // starting and ending vertices
     private int totalDistance;
     private int[] distances; // distance from start 
-    private T[] closestPredecessor; // closest predecessor for each node (null if start node)
+    private T[] closestPredecessor;
     private LinkedList<T> visited, unvisited; // visited and unvisited vertices
     private ArrayQueue<T> path; // shortest path
 
