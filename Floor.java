@@ -5,6 +5,7 @@
  * */
 
 import javafoundations.LinkedQueue;
+import javafoundations.Queue;
 import java.util.LinkedList;
 
 public class Floor {
