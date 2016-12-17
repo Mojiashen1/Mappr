@@ -26,10 +26,18 @@ public class Floor {
     matrix.addEdge(r1, r2, distance);
   }
   
-  public Queue<Room> traverseFloor(Room start, Room end){
-    Queue<Room> queue = new LinkedQueue<Room>();
-    
-    return queue;
+  public WeightedPath<Room> traverseFloor(Room start, Room end){
+    LinkedList<Room> rooms = getRooms();
+
+    if(rooms.contains(start) && rooms.contains(end)) {
+      Queue<Room> shortestPath = matrix.getShortestPath(start, end);
+      int shortestDistance = matrix.getShortestDistance(start, end);
+
+      WeightedPath<Room> roomPath = new WeightedPath<Room>(shortestPath, shortestDistance);
+      return roomPath;
+    }
+
+    return null;
   }
   
   public boolean exist(Room room) {

@@ -1,6 +1,7 @@
 import java.util.LinkedList;
 import java.util.HashMap;
 import javafoundations.LinkedQueue;
+import javafoundations.Queue;
 
 public class Building {
   private String name;
@@ -70,15 +71,70 @@ public class Building {
 
     return elevatorsOnFloor;
   }
+
+  private LinkedList<Integer> getFloorsForElevator(Elevator e) {
+    LinkedList<Integer> elevatorFloors = new LinkedList<Integer>();
+    LinkedList<Floor> floorsForElevator = elevators.get(e.getName());
+
+    for(Floor f : floorsForElevator) {
+      elevatorFloors.add(f.getFloor());
+    }
+
+    return elevatorFloors;
+  }
+
+  private int minDifference(LinkedList<Integer> elevatorFloors, int floor2) {
+    int minDistance = Integer.MAX_VALUE;
+    int minNum = -1;
+
+    for(Integer i : elevatorFloors) {
+      if(Math.abs(i - floor2) < minDistance) {
+        minDistance = Math.abs(i - floor2);
+        minNum = i;
+      }
+    }
+
+    return minNum;
+  }
   
   public boolean sameFloor(Room r1, Room r2){
     return r1.getFloor() == r2.getFloor();
   }
   
-  public LinkedQueue<Room> traverseBuilding(Room r1, Room r2){
-    LinkedQueue<Room> traversal = new LinkedQueue<Room>();
-    if (sameFloor(r1, r2)){
+  public Queue<Room> traverseBuilding(Room r1, Room r2){
+    Queue<Room> traversal = new LinkedQueue<Room>();
+
+    int floor1 = r1.getFloor();
+    int floor2 = r2.getFloor();
+
+    if(r1 instanceof Elevator && !(r2 instanceof Elevator)) {
+      LinkedList<Integer> elevatorFloors = getFloorsForElevator((Elevator) r1);
+
+      if(elevatorFloors.contains(floor2)) {
+        floor1 = floor2;
+      } else {
+        floor1 = minDifference(elevatorFloors, floor2);
+      }
+
+    } else if (!(r1 instanceof Elevator) && (r2 instanceof Elevator)) {
+      LinkedList<Integer> elevatorFloors = getFloorsForElevator((Elevator) r2);
+
+      if(elevatorFloors.contains(floor1)) {
+        floor2 = floor1;
+      } else {
+        floor2 = minDifference(elevatorFloors, floor1);
+      }
+    } else {
+       // *** What Happens if They're Both Elevators ***
+    }
+
+    if (floor1 == floor2){
       // call traverseFloor and return
+      Floor roomFloor = getFloorByNumber(r1.getFloor());
+
+      if(roomFloor != null) {
+        return roomFloor.traverseFloor(r1, r2).getPath();
+      }
     }
     else {
       // find all traversals on both floors to each elevator, then check
@@ -88,6 +144,16 @@ public class Building {
     
     
     return traversal;
+  }
+
+  private Floor getFloorByNumber(int floorNumber) {
+    for(Floor f : floors) {
+      if(f.getFloor() == floorNumber) {
+        return f;
+      }
+    }
+
+    return null;
   }
   
   //getters
@@ -106,5 +172,43 @@ public class Building {
   //setters 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public static void main(String[] args) {
+    Building building = new Building("Academic Building");
+    Floor floor1 = new Floor(1);
+    Floor floor2 = new Floor(2);
+    Floor floor3 = new Floor(3);
+
+    Room room1 = new Room("Science Room", 1);
+    Room room2 = new Room("Math Room", 1);
+
+    Room room3 = new Room("English Room", 2);
+    Room room4 = new Room("Music Room", 2);
+
+    Elevator elevator1 = new Elevator("Elevator 1", -1);
+    Elevator elevator2 = new Elevator("Elevator 2", -1);
+
+    floor1.addRoom(room1);
+    floor1.addRoom(room2);
+    floor1.addRoom(elevator1);
+    floor1.connectRooms(room1, room2, 1);
+    floor1.connectRooms(room2, elevator1, 1);
+    floor1.connectRooms(room1, elevator1, 5);
+
+    floor2.addRoom(room3);
+    floor2.addRoom(room4);
+    floor2.addRoom(elevator1);
+    floor2.addRoom(elevator2);
+
+    floor3.addRoom(elevator2);
+
+    building.addFloor(floor1);
+    building.addFloor(floor2);
+    building.addFloor(floor3);
+
+    System.out.println("Floors 1 & 2 are connected: " + building.isConnected(floor1, floor2));
+    System.out.println("Floors 1 & 3 are directly connected: " + building.isConnected(floor1, floor3));
+    System.out.println("Path between Room1 and Elevator1 on Floor1: " + building.traverseBuilding(room1, elevator1));
   }
 }
