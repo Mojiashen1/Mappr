@@ -1,0 +1,16 @@
+Building -> Andrew (point person), Clarissa, Mojia
+Elevator -> Andrew, Clarissa, Mojia
+Floor -> Andrew, Clarissa (point person), Mojia
+InputScreen -> Andrew, Mojia (point person)
+InstructionScreen -> Andrew, Mojia (point person)
+MapprGUI -> Andrew, Mojia (point person)
+Prefs -> Andrew
+Room -> Clarissa, Mojia
+RouteDataTransfer -> Andrew
+Screen -> Andrew
+ScreenType -> Andrew
+Stairs -> Clarissa, Mojia
+WeightedAdjMatGraph -> Clarissa
+WeightedGraph -> Clarissa
+WeightedPath -> Andrew (point person), Clarissa
+WelcomeScreen -> Andrew, Mojia (point person)
