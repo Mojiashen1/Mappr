@@ -9,7 +9,6 @@ public class MapprGUI extends JFrame{
   private InputScreen inputScreen;
   private InstructionScreen instructionScreen;
   private Building building;
-  private Queue<Room> directions;
   
   public MapprGUI() {
     building = new Building("Science Center", "create.mappr");
@@ -21,8 +20,6 @@ public class MapprGUI extends JFrame{
     inputScreen.setVisible(true);
     instructionScreen = new InstructionScreen(this);
     instructionScreen.setVisible(true);
-
-    directions = new LinkedQueue<Room>();
     
     getContentPane().add(welcomeScreen);
 
@@ -52,20 +49,27 @@ public class MapprGUI extends JFrame{
     validate();
   }
 
-  public Queue<Room> getDirections() {
-    return directions;
-  }
-
   public boolean setRouteData(RouteDataTransfer rDto) {
     Room r1 = building.findRoomByName(rDto.getFrom());
     Room r2 = building.findRoomByName(rDto.getTo());
 
     if(r1 != null && r2 != null) {
-      directions = building.traverseBuilding(r1, r2, rDto.getPreferences());
+      Queue<Room> directions = building.traverseBuilding(r1, r2, rDto.getPreferences());
+      instructionScreen.setInstructions(convertToQueueString(directions));
       return true;
     }
 
     return false;
+  }
+
+  private Queue<String> convertToQueueString(Queue<Room> room) {
+    Queue<String> strings = new LinkedQueue<String>();
+
+    while(!room.isEmpty()) {
+      strings.enqueue(room.dequeue().toString());
+    }
+
+    return strings;
   }
   
   public static void main(String [] args) {

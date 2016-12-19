@@ -8,6 +8,7 @@ import java.awt.event.*;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Dimension;
+import javafoundations.Queue;
 
 /*
  * Author: Mojia Shen
@@ -97,7 +98,14 @@ public class InstructionScreen extends JPanel{
   }
 
   public void setInstructions(Queue<String> instructionsList) {
+    String instructionsStr = "<html>";
+    int stop = instructionsList.size();
+    for(int i = 0; i < stop; i++) {
+      instructionsStr += String.valueOf(i) + ") " + instructionsList.dequeue();
+      instructionsStr += i < (stop - 1) ? "<br />" : "</html>";
+    }
 
+    instructions.setText(instructionsStr);
   }
   
   /*
