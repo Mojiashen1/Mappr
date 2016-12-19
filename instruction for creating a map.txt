@@ -1,0 +1,38 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Instructions for creating a map \
+\
+1. list rooms, the floor they are on, and whether they are an elevator (true if it is an elevator, false otherwise). If they are an elevator, the input another boolean indicating whether they are stairs\
+\
+2. then input an empty line that separates the rooms and their relations\
+\
+3. input the relations between the rooms, input in this sequence: \
+name, floor, the room to the north, the distance between the room and the room to its north, the room to the east, distance between room and east, the room to the south, the distance between the room and the south, west, the distance between room and west. \
+\
+example: \
+\
+RM100 1 false\
+RM101 1 false\
+RM102 1 false\
+EL1 1 true true\
+EL2 1 true false\
+RM200 2 false\
+RM201 2 false\
+RM202 2 false\
+EL2 2 true false\
+EL1 2 true true\
+\
+RM100 1 none none RM101 5 EL2 1 EL1 3\
+RM101 1 none none none none none none RM100 5\
+RM102 1 none none none none EL1 1 none none\
+EL1 1 RM102 1 RM100 3 none none none none\
+EL2 1 RM100 1 none none none none none none\
+RM200 2 RM201 17 EL2 1 RM202 2 none none\
+RM201 2 EL1 1 none none RM200 17 none none\
+RM202 2 RM200 2 none none none none none none\
+EL1 2 none none none none RM201 1 none none \
+EL2 2 none none none none none none RM200 1}

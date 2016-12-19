@@ -383,7 +383,7 @@ public class Building {
     for(Room r : rooms) {
       fa = findByNumber(floorsToAdd, r.getFloor());
       if(fa != null) {
-        fa.addRoom(r);
+        fa.addRoom(r);s
       } else {
         floorsToAdd.add(new Floor(r.getFloor()));
         fa = findByNumber(floorsToAdd, r.getFloor());
