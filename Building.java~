@@ -10,14 +10,14 @@ public class Building {
   private HashMap<String, LinkedList<Floor>> elevators;
   private LinkedList<Floor> floors;
   
-  // Constructor
+  // Constructor 1 that takes a name and set elevators and floors to empty HashMap and LinkedList 
   public Building (String name) {
     this.name = name;
     this.elevators = new HashMap<String, LinkedList<Floor>>();
     this.floors = new LinkedList<Floor>();
   }
 
-  // Constructor
+  // Constructor 2 that takes a name and a file to read
   public Building(String name, String fileName) {
     this(name);
     readFromTextFile(fileName);
@@ -174,8 +174,6 @@ public class Building {
       } else {
         floor2 = minDifference(elevatorFloors, floor1);
       }
-    } else {
-       // *** What Happens if They're Both Elevators ***
     }
 
     if (floor1 == floor2){
@@ -452,7 +450,7 @@ public class Building {
     Building academicBuilding = new Building("Science Center", "create.mappr");
 
     Room s1 = academicBuilding.findRoomByName("RM100");
-    Room s2 = academicBuilding.findRoomByName("RM201");
+    Room s2 = academicBuilding.findRoomByName("RM202");
 
     System.out.println("Floors 1 & 2 are connected: " + academicBuilding.isConnected(1, 2));
     System.out.println("Path from Room 100 to Room 202: " + academicBuilding.traverseBuilding(s1, s2));

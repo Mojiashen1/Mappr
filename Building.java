@@ -221,6 +221,11 @@ public class Building {
     
     return traversal;
   }
+  
+  public LinkedQueue<String> getInstructions (LinkedQueue<Room> travesal ) {
+    Instructions instructions = new Instructions(); 
+    
+  }
 
   /*
   * Returns the combination of two queues
@@ -402,6 +407,86 @@ public class Building {
   public void setName(String name) {
     this.name = name;
   }
+  
+  private class Instructions {
+    private LinkedQueue<String> instructions;
+    private LinkedQueue<Room> traversal;
+    
+    public Instructions(LinkedQueue<Room> traversal){
+      this.traversal = traversal;
+      this.instructions = new LinkedQueue<String>();
+    }
+    
+    public LinkedQueue<String> getInstructions() {
+      Room current = traversal.dequeue();
+      Room temp;
+      String lastDirection = "";
+      String newDirection = "";
+      int currentDistance;
+      
+      while (!traversal.isEmpty()){
+        temp = traversal.dequeue();
+        newDirection = getRelationship(current, temp);
+        if (!newDirection.equals(lastDirection)){
+          instructions.enqueue(convertToNatLanguage(lastDirection, newDirection, current, temp, distance));
+        }
+        else {
+          //find the floor of the room 
+          int currentFloor = temp.getFloor();
+          currentDistance += getDistance(current, temp);
+        }
+        lastDirection = newDirection;
+        current = temp;
+      }
+      return instructions;
+    }
+    
+    private String convertToNatLanguage(String lastDirection, String newDirection, Room oldRoom, Room newRoom, int distance){
+      String instruction = "";
+      if (lastDirection.equals("")){
+        instruction += "Walk towards room " + newRoom.getName() + " for " + getDistance(oldRoom, newRoom) + " steps.";
+      }
+      else {
+        instruction += "Take " + distance + " steps, then turn ";
+        String[] rightTurn = new String[]{"north", "east", "south", "west"};
+        int newDirIndex, lastDirIndex;
+        // finding index in rightturn array
+        for (int i = 0; i < rightTurn.length; i++){
+          if (rightTurn[i].equals(lastDirection)){
+            lastDirIndex = i;
+          }
+          if (rightTurn[i].equals(newDirection)){
+            newDirIndex = i;
+          }
+        }
+        
+        if (lastDirIndex < newDirIndex || (lastDirIndex == 3 && newDirIndex == 0)){  
+          instruction += "right ";
+        }
+        else {
+          instruction += "left ";
+        }
+        
+        instruction += " at room " + newRoom.getName() + ".";
+      }
+      return instruction;
+    }
+    
+    private String getRelationship(Room r1, Room r2){
+      String n1 = r1.getName();
+      String n2 = r2.getName();
+      
+      switch (n2){
+        case (r1.getNorth().getName()): return "north"; 
+        case (r1.getEast().getName()): return "east";
+        case (r1.getSouth().getName()): return "south";
+        case (r1.getWest().getName()): return "west";
+        default: return "NOT_FOUND";
+      }
+      
+    }
+  }
+
 
   public static void main(String[] args) {
     Building building = new Building("Academic Building");

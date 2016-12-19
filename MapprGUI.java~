@@ -9,11 +9,8 @@
 import javax.swing.*;
 import java.awt.Font;
 import java.awt.event.*;
-<<<<<<< HEAD
-=======
 import javafoundations.LinkedQueue;
 import javafoundations.Queue;
->>>>>>> 5e3265fdcf0e81a6b195931b742dfb0cba6482be
 
 public class MapprGUI extends JFrame{
   private WelcomeScreen welcomeScreen;
@@ -24,11 +21,8 @@ public class MapprGUI extends JFrame{
   
   //constructor that initialize three screen and display the welcome screen
   public MapprGUI() {
-<<<<<<< HEAD
     //set the GUI to iPhone 6 screen size
-=======
     building = new Building("Science Center", "create.mappr");
->>>>>>> 5e3265fdcf0e81a6b195931b742dfb0cba6482be
     setSize(320, 568);
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     
