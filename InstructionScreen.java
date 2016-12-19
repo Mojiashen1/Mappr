@@ -95,6 +95,10 @@ public class InstructionScreen extends JPanel{
     add(outerLayout2);
     //****finish layout group for the finish button
   }
+
+  public void setInstructions(Queue<String> instructionsList) {
+
+  }
   
   /*
    * getType return the screen type of the current screen

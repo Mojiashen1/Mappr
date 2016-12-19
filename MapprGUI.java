@@ -61,7 +61,7 @@ public class MapprGUI extends JFrame{
     Room r2 = building.findRoomByName(rDto.getTo());
 
     if(r1 != null && r2 != null) {
-      directions = building.traverseBuilding(r1, r2);
+      directions = building.traverseBuilding(r1, r2, rDto.getPreferences());
       return true;
     }
 
