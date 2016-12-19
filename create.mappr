@@ -1,13 +1,13 @@
 RM100 1 false
 RM101 1 false
 RM102 1 false
-EL1 1 true
-EL2 1 true
+EL1 1 true true
+EL2 1 true false
 RM200 2 false
 RM201 2 false
 RM202 2 false
-EL2 2 true
-EL1 2 true
+EL2 2 true false
+EL1 2 true true
 
 RM100 1 none none RM101 5 EL2 1 EL1 3
 RM101 1 none none none none none none RM100 5

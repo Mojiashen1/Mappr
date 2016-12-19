@@ -1,7 +1,8 @@
 public class RouteDataTransfer {
-	private String from, to, preferences;
+	private String from, to;
+	private Prefs preferences;
 
-	public RouteDataTransfer(String from, String to, String preferences) {
+	public RouteDataTransfer(String from, String to, Prefs preferences) {
 		this.from = from;
 		this.to = to;
 		this.preferences = preferences;
@@ -15,7 +16,7 @@ public class RouteDataTransfer {
 		return to;
 	}
 
-	public String getPreferences() {
+	public Prefs getPreferences() {
 		return preferences;
 	}
 }

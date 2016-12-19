@@ -3,6 +3,7 @@ import java.util.HashMap;
 import javafoundations.LinkedQueue;
 import javafoundations.Queue;
 import java.util.Scanner;
+import java.util.Iterator;
 import java.io.*;
 
 public class Building {
@@ -147,11 +148,19 @@ public class Building {
 
     return new LinkedQueue<Room>();
   }
+
+  /*
+  * Returns the shortest path between two rooms, assuming no preference
+  */
+  public Queue<Room> traverseBuilding(Room r1, Room r2) {
+    return traverseBuilding(r1, r2, Prefs.NO_PREFERENCES);
+  }
+
   
   /*
-  * Returns the shortest path between two rooms
+  * Returns the shortest path between two rooms, given a preference
   */
-  public Queue<Room> traverseBuilding(Room r1, Room r2){
+  public Queue<Room> traverseBuilding(Room r1, Room r2, Prefs preferences){
     Queue<Room> traversal = new LinkedQueue<Room>();
 
     int floor1 = r1.getFloor();
@@ -193,6 +202,19 @@ public class Building {
       Floor fl2 = getFloorByNumber(floor2);
 
       LinkedList<Elevator> connections = getElevatorsBetweenFloors(fl1, fl2);
+      Iterator<Elevator> elevatorIterator = connections.iterator();
+      Elevator el;
+
+      while(elevatorIterator.hasNext()) {
+        el = elevatorIterator.next();
+        if(preferences == Prefs.STAIRS && el.isElevator()) {
+          elevatorIterator.remove();
+        }
+
+        if(preferences == Prefs.ELEVATOR && !el.isElevator()) {
+          elevatorIterator.remove();
+        }
+      }
 
       WeightedPath minPath = null, fl1Path, fl2Path;
       int minDistance = Integer.MAX_VALUE, combinedWeight;
@@ -302,7 +324,7 @@ public class Building {
         if(collectingRooms) {
           if(tokens.length > 1) {
             if(Boolean.valueOf(tokens[2])) {
-              rooms.add(new Elevator(tokens[0], Integer.parseInt(tokens[1])));
+              rooms.add(new Elevator(tokens[0], Integer.parseInt(tokens[1]), Boolean.valueOf(tokens[3])));
             } else {
               rooms.add(new Room(tokens[0], Integer.parseInt(tokens[1])));
             }
@@ -415,8 +437,8 @@ public class Building {
     Room room3 = new Room("English Room", 2);
     Room room4 = new Room("Music Room", 2);
 
-    Elevator elevator1 = new Elevator("Elevator 1", -1);
-    Elevator elevator2 = new Elevator("Elevator 2", -1);
+    Elevator elevator1 = new Elevator("Elevator 1", -1, true);
+    Elevator elevator2 = new Elevator("Elevator 2", -1, true);
 
     floor1.addRoom(room1);
     floor1.addRoom(room2);
@@ -454,5 +476,7 @@ public class Building {
 
     System.out.println("Floors 1 & 2 are connected: " + academicBuilding.isConnected(1, 2));
     System.out.println("Path from Room 100 to Room 202: " + academicBuilding.traverseBuilding(s1, s2));
+    System.out.println("Path from Room 100 to Room 202 (no elevators): " + academicBuilding.traverseBuilding(s1, s2, Prefs.STAIRS));
+    System.out.println("Path from Room 100 to Room 202 (no stairs): " + academicBuilding.traverseBuilding(s1, s2, Prefs.ELEVATOR));
   }
 }

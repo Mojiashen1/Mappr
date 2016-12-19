@@ -164,14 +164,12 @@ public class InputScreen extends JPanel implements Screen {
   }
 
   private RouteDataTransfer createRDTO() {
-    String pref = "";
+    Prefs pref = Prefs.NO_PREFERENCE;
 
-    if(noPreference.isSelected()) {
-      pref = "No Preferences";
+    if(elevatorOnly.isSelected()) {
+      pref = Prefs.ELEVATOR;
     } else if (stairOnly.isSelected()) {
-      pref = "Stair";
-    } else {
-      pref = "Elevator";
+      pref = Prefs.STAIRS;
     }
 
     RouteDataTransfer rDto = new RouteDataTransfer(from.getText(), to.getText(), pref);
