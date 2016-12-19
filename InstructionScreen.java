@@ -67,7 +67,8 @@ public class InstructionScreen extends JPanel{
     instructions = new JLabel("Blah blah");
     instructions.setHorizontalAlignment(JLabel.CENTER);
     instructions.setForeground(new Color(94, 93, 92));
-    instructions.setFont(new Font("Brandon Grotesque", Font.PLAIN, 14));
+    instructions.setFont(new Font("Brandon Grotesque", Font.PLAIN, 10));
+    instructions.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
     add(instructions);
     
     //****create a layout group so the button can appear in the middle horizontally
@@ -76,6 +77,7 @@ public class InstructionScreen extends JPanel{
     
     //create an inner layout so the button can appear in the middle vertically 
     JPanel innerLayout2 = new JPanel(new GridLayout(3, 1));
+    innerLayout2.add(new JLabel());
     innerLayout2.add(new JLabel());
     
     //**create a finish button
@@ -88,7 +90,6 @@ public class InstructionScreen extends JPanel{
     finishButton.addActionListener(new ButtonListener());
     
     innerLayout2.add(finishButton);
-    innerLayout2.add(new JLabel());
     
     outerLayout2.add(innerLayout2);
     //add an empty labels
@@ -101,7 +102,7 @@ public class InstructionScreen extends JPanel{
     String instructionsStr = "<html>";
     int stop = instructionsList.size();
     for(int i = 0; i < stop; i++) {
-      instructionsStr += String.valueOf(i) + ") " + instructionsList.dequeue();
+      instructionsStr += String.valueOf(i + 1) + ") " + instructionsList.dequeue();
       instructionsStr += i < (stop - 1) ? "<br />" : "</html>";
     }
 

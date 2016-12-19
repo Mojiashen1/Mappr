@@ -51,7 +51,7 @@ public class InputScreen extends JPanel implements Screen {
     JPanel textPanel1 = new JPanel(new GridLayout(3, 1));
     textPanel1.add(new JLabel());
     //**create a text input field FROM
-    from = new JTextField("E101");
+    from = new JTextField("RM200");
     from.setFont(new Font("Brandon Grotesque", Font.PLAIN, 12));
     from.setForeground(new Color(94, 93, 92));
     textPanel1.add(from);
@@ -71,7 +71,7 @@ public class InputScreen extends JPanel implements Screen {
     JPanel textPanel2 = new JPanel(new GridLayout(3, 1));
     textPanel2.add(new JLabel());
     //**create a new text input field TO
-    to = new JTextField("E256");
+    to = new JTextField("RM101");
     to.setFont(new Font("Brandon Grotesque", Font.PLAIN, 12));
     to.setForeground(new Color(94, 93, 92));
     textPanel2.add(to);

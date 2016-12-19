@@ -139,10 +139,14 @@ public class Floor {
   
   private class Instructions {
     private String[][] directionTurns = {
-      {"", "right", "around", "left"},
-      {"left", "", "right", "around"},
-      {"around", "left", "", "right"},
-      {"right", "around", "left", ""}
+      {"around", "left", "straight", "right"},
+      {"right", "around", "left", "straight"},
+      {"straight", "right", "around", "left"},
+      {"left", "straight", "right", "around"}
+//      {"", "right", "around", "left"},
+//      {"left", "", "right", "around"},
+//      {"around", "left", "", "right"},
+//      {"right", "around", "left", ""}
     };
 
     private Queue<String> instructions;
@@ -177,8 +181,6 @@ public class Floor {
           distance = distanceBetween;
         }
       }
-
-      if()
       this.instructions.enqueue("Take " + distance + " steps towards room " + next.toString());
       
       return instructions;

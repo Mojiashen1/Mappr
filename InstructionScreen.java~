@@ -16,6 +16,7 @@ import java.awt.event.*;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Dimension;
+import javafoundations.Queue;
 
 public class InstructionScreen extends JPanel{
   private MapprGUI gui;
@@ -63,7 +64,7 @@ public class InstructionScreen extends JPanel{
     instructionLabel.setFont(new Font("Brandon Grotesque", Font.PLAIN, 16));
     add(instructionLabel);
     
-    instructions = new JLabel("Blah blah BLAH");
+    instructions = new JLabel("Blah blah");
     instructions.setHorizontalAlignment(JLabel.CENTER);
     instructions.setForeground(new Color(94, 93, 92));
     instructions.setFont(new Font("Brandon Grotesque", Font.PLAIN, 14));
@@ -94,6 +95,17 @@ public class InstructionScreen extends JPanel{
     outerLayout2.add(new JLabel());
     add(outerLayout2);
     //****finish layout group for the finish button
+  }
+
+  public void setInstructions(Queue<String> instructionsList) {
+    String instructionsStr = "<html>";
+    int stop = instructionsList.size();
+    for(int i = 0; i < stop; i++) {
+      instructionsStr += String.valueOf(i) + ") " + instructionsList.dequeue();
+      instructionsStr += i < (stop - 1) ? "<br />" : "</html>";
+    }
+
+    instructions.setText(instructionsStr);
   }
   
   /*

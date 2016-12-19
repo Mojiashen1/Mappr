@@ -1,3 +1,10 @@
+/*
+ * Author: Mojia Shen
+ * Purpose: InputScreen is the second screen the users see. 
+ * It asks the user to input where they are, where they want to go, and add their preferences for elevator or stair. 
+ * Date: Dec 17th 2016
+ * */
+
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -10,13 +17,6 @@ import java.awt.event.*;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Dimension;
-
-/*
- * Author: Mojia Shen
- * Purpose: InputScreen is the second screen the users see. 
- * It asks the user to input where they are, where they want to go, and add their preferences for elevator or stair. 
- * Date: Dec 17th 2016
- * */
 
 public class InputScreen extends JPanel implements Screen {
   private MapprGUI gui;
@@ -51,7 +51,7 @@ public class InputScreen extends JPanel implements Screen {
     JPanel textPanel1 = new JPanel(new GridLayout(3, 1));
     textPanel1.add(new JLabel());
     //**create a text input field FROM
-    from = new JTextField();
+    from = new JTextField("E101");
     from.setFont(new Font("Brandon Grotesque", Font.PLAIN, 12));
     from.setForeground(new Color(94, 93, 92));
     textPanel1.add(from);
@@ -71,7 +71,7 @@ public class InputScreen extends JPanel implements Screen {
     JPanel textPanel2 = new JPanel(new GridLayout(3, 1));
     textPanel2.add(new JLabel());
     //**create a new text input field TO
-    to = new JTextField();
+    to = new JTextField("E256");
     to.setFont(new Font("Brandon Grotesque", Font.PLAIN, 12));
     to.setForeground(new Color(94, 93, 92));
     textPanel2.add(to);
@@ -162,6 +162,19 @@ public class InputScreen extends JPanel implements Screen {
   public ScreenType getType() {
     return ScreenType.INPUT;
   }
+
+  private RouteDataTransfer createRDTO() {
+    Prefs pref = Prefs.NO_PREFERENCES;
+
+    if(elevatorOnly.isSelected()) {
+      pref = Prefs.ELEVATOR;
+    } else if (stairOnly.isSelected()) {
+      pref = Prefs.STAIRS;
+    }
+
+    RouteDataTransfer rDto = new RouteDataTransfer(from.getText(), to.getText(), pref);
+    return rDto;
+  }
   
   /*
    * ButtonListener is a private class that implements ActionListener. It tells the button what action to perform when clicked
@@ -174,9 +187,15 @@ public class InputScreen extends JPanel implements Screen {
       if (event.getSource() == searchButton) {
         //if the FROM or TO field is empty, show the error message, otherwise, switch screen
         if (!validate(from) || !validate(to)) {
+          errorLabel.setText("Did you forget something?");
           errorLabel.setVisible(true);
         } else {
-          gui.switchScreen(getType());    
+          if(gui.setRouteData(createRDTO())) {
+            gui.switchScreen(getType()); 
+          } else {
+            errorLabel.setText("Where you going?");
+            errorLabel.setVisible(true);
+          }
         }
       }
     }
