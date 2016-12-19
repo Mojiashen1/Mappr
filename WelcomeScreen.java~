@@ -92,7 +92,7 @@ public class WelcomeScreen extends JPanel implements Screen {
    * */
   private class ButtonListener implements ActionListener {
     /*actionPerformed is a method required by ActionListener interface
-     * It takes an event and if the source of the even is startButton, it will switch screen to the next
+     * It takes an event and if the source of the event is startButton, it will switch screen to the next
      * */
     public void actionPerformed(ActionEvent event){
       if (event.getSource() == startButton) {

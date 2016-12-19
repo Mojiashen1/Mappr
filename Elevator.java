@@ -1,7 +1,7 @@
-/*Name: Mojia Shen, Clarissa Verish
+/*
+ * Author: Mojia Shen, Clarissa Verish
  * Date: Dec 11th 2016
- * Room.java
- * 
+ * Elevator.java extends from the Room class and create an elevator 
  * */
 
 public class Elevator extends Room {
@@ -13,7 +13,7 @@ public class Elevator extends Room {
     super(name, floor);
     this.isElevator = isElevator;
   }
-  
+
   //constructor that takes name, floor, and the room on the four directions of it
   public Elevator (String name, int floor, boolean isElevator, Room north, Room south, Room east, Room west, Elevator up, Elevator down) {
     super(name, floor, north, south, east, west);
@@ -23,19 +23,23 @@ public class Elevator extends Room {
   }
   
   //getters
+  //return the object above the elevator 
   public Elevator getUp(){
     return up;
   }
   
+  //return the object below the elevator 
   public Elevator getDown(){
     return down;
   }
   
   //setters
+  //set the object above the elevator 
   public void setUp(Elevator up){
     this.up = up;
   }
   
+  //set the object below the elevator 
   public void setDown(Elevator down){
     this.down = down;
   }

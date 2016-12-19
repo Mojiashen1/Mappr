@@ -11,14 +11,14 @@ public class Building {
   private HashMap<String, LinkedList<Floor>> elevators;
   private LinkedList<Floor> floors;
   
-  // Constructor
+  // Constructor 1 that takes a name and set elevators and floors to empty HashMap and LinkedList 
   public Building (String name) {
     this.name = name;
     this.elevators = new HashMap<String, LinkedList<Floor>>();
     this.floors = new LinkedList<Floor>();
   }
 
-  // Constructor
+  // Constructor 2 that takes a name and a file to read
   public Building(String name, String fileName) {
     this(name);
     readFromTextFile(fileName);
@@ -152,7 +152,7 @@ public class Building {
   /*
   * Returns the shortest path between two rooms, assuming no preference
   */
-  public Queue<Room> traverseBuilding(Room r1, Room r2) {
+  public Queue<String> traverseBuilding(Room r1, Room r2) {
     return traverseBuilding(r1, r2, Prefs.NO_PREFERENCES);
   }
 
@@ -160,8 +160,8 @@ public class Building {
   /*
   * Returns the shortest path between two rooms, given a preference
   */
-  public Queue<Room> traverseBuilding(Room r1, Room r2, Prefs preferences){
-    Queue<Room> traversal = new LinkedQueue<Room>();
+  public Queue<String> traverseBuilding(Room r1, Room r2, Prefs preferences){
+    Queue<String> traversal = new LinkedQueue<String>();
 
     int floor1 = r1.getFloor();
     int floor2 = r2.getFloor();
@@ -190,7 +190,7 @@ public class Building {
       Floor roomFloor = getFloorByNumber(r1.getFloor());
 
       if(roomFloor != null) {
-        return roomFloor.traverseFloor(r1, r2).getPath();
+        return roomFloor.getInstructions(roomFloor.traverseFloor(r1, r2));
       }
     }
     else {
@@ -219,6 +219,7 @@ public class Building {
       WeightedPath minPath = null, fl1Path, fl2Path;
       int minDistance = Integer.MAX_VALUE, combinedWeight;
       Queue<Room> combinedPath;
+      Queue<String> combinedInstructions = null, instructions1, instructions2;
 
       for(Elevator e : connections) {
         fl1Path = fl1.traverseFloor(r1, fl1.findRoomByName(e.getName()));
@@ -226,17 +227,28 @@ public class Building {
 
         if(fl1Path != null && fl2Path != null) {
           combinedWeight = fl1Path.getWeight() + fl2Path.getWeight();
+          System.out.println(combinedWeight);
           combinedPath = combineQueues(fl1Path.getPath(), fl2Path.getPath());
 
           if(combinedWeight < minDistance) {
             minPath = new WeightedPath(combinedPath, combinedWeight);
             minDistance = combinedWeight;
+            instructions1 = fl1.getInstructions(fl1Path);
+            instructions2 = fl2.getInstructions(fl2Path);
+
+            System.out.println(fl1Path.getPath());
+
+            int floorDiff = fl1.getFloor() - fl2.getFloor();
+
+            instructions1.enqueue("Take the " + e.getName() + " " + getElevatorDirection(floorDiff) + " " + Math.abs(floorDiff) + " floors");
+
+            combinedInstructions = combineInstructions(instructions1, instructions2);
           }
         }
       }
 
-      if(minPath != null) {
-        return minPath.getPath();
+      if(combinedInstructions != null) {
+        return combinedInstructions;
       }
     }
     
@@ -247,9 +259,20 @@ public class Building {
   /*
   * Returns the combination of two queues
   */
+  private Queue<String> combineInstructions(Queue<String> queue1, Queue<String> queue2) {
+    int stop = queue2.size();
+    for(int i = 0; i < stop; i++) {
+      queue1.enqueue(queue2.dequeue());
+    }
+
+    return queue1;
+  }
+
+  /*
+  *
+  */
   private Queue<Room> combineQueues(Queue<Room> queue1, Queue<Room> queue2) {
     int stop = queue2.size();
-    queue2.dequeue();
     for(int i = 1; i < stop; i++) {
       queue1.enqueue(queue2.dequeue());
     }
@@ -268,6 +291,10 @@ public class Building {
     }
 
     return null;
+  }
+
+  private String getElevatorDirection(int floorDiff) {
+    return floorDiff > 0 ? "up" : "down";
   }
   
   //getters
@@ -388,6 +415,11 @@ public class Building {
   * Creates all of the connections between the rooms
   */
   private void createConnections(String[] tokens) {
+    for(String s : tokens) {
+      System.out.print(s + " ");
+    }
+    System.out.println("");
+
     Floor f = f = getFloorByNumber(Integer.parseInt(tokens[1]));
     Room r = findRoomByName(tokens[0]), connect;
 

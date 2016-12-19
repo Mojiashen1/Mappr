@@ -291,6 +291,7 @@ public class WeightedAdjMatGraph<T> implements WeightedGraph<T>, Iterable<T>{
         int currentIndex = vertexIndex(current);
         LinkedList<T> neighbors = getUnvisitedNeighbors(current); // getting unvisited neighbors
         
+        //what is this doing here???
         if (neighbors.isEmpty()){
           
         }
