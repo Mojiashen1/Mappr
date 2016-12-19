@@ -135,6 +135,13 @@ public class Floor {
   }
   
   private class Instructions {
+    private String[][] directionTurns = {
+      {"", "right", "around", "left"},
+      {"left", "", "right", "around"},
+      {"around", "left", "", "right"},
+      {"right", "around", "left", ""}
+    };
+
     private Queue<String> instructions;
     private Queue<Room> traversal;
     
@@ -144,67 +151,55 @@ public class Floor {
     }
     
     public Queue<String> getInstructions() {
-      Room current = traversal.dequeue();
-      Room temp;
+      Room current, next = traversal.dequeue();
       String lastDirection = "";
-      String newDirection = "";
-      int currentDistance = 0;
+      String direction = "";
+      int distance = 0, distanceBetween;
       
       while (!traversal.isEmpty()){
-        temp = traversal.dequeue();
-        System.out.println(getDistance(current, temp));
-        newDirection = getRelationship(current, temp);
-        if (newDirection.equals(lastDirection)) {
-          System.out.println("Same direction");
-          currentDistance += getDistance(current, temp);
+        current = next;
+        next = traversal.dequeue();
+        direction = getRelationship(current, next);
+        distanceBetween = getDistance(current, next);
+
+        if(lastDirection.equals("")) {
+          lastDirection = direction;
         }
-        else if (!newDirection.equals(lastDirection)){
-          if (currentDistance == 0) {
-            currentDistance = getDistance(current, temp);
-          }
-          instructions.enqueue(convertToNatLanguage(lastDirection, newDirection, current, temp, currentDistance));
-          currentDistance = 0;    
+
+        if(direction.equals(lastDirection)) {
+          distance += distanceBetween;
+        } else {
+          this.instructions.enqueue(convertToNatLanguage(lastDirection, direction, distance, current));
+          lastDirection = direction;
+          distance = distanceBetween;
         }
-        lastDirection = newDirection;
-        current = temp;
       }
+
+      this.instructions.enqueue("Take " + distance + " steps towards room " + next.toString());
       
       return instructions;
     }
     
-    private String convertToNatLanguage(String lastDirection, String newDirection, Room oldRoom, Room newRoom, int distance){
+    private String convertToNatLanguage(String lastDirection, String newDirection, int distance, Room turn) {
       String instruction = "";
-      if (lastDirection.equals("")){
-        instruction += "Walk towards room " + newRoom.getName() + " for " + getDistance(oldRoom, newRoom) + " steps.";
+      int lastDirectionIndex = getDirectionIndex(lastDirection);
+      int newDirectionIndex = getDirectionIndex(newDirection);
+
+      String turnDirection = directionTurns[lastDirectionIndex][newDirectionIndex];
+
+      return "Walk " + distance + " steps and turn " + turnDirection + " at room " + turn.getName();
+    }
+
+    private int getDirectionIndex(String direction) {
+      if(direction.toLowerCase().equals("north")) {
+        return 0;
+      } else if (direction.toLowerCase().equals("east")) {
+        return 1;
+      } else if (direction.toLowerCase().equals("south")) {
+        return 2;
+      } else {
+        return 3;
       }
-      else {
-        instruction += "Then take " + distance + " steps, then turn ";
-        String[] rightTurn = new String[]{"north", "east", "south", "west"};
-        int newDirIndex = 0;
-        int lastDirIndex = 0;
-        // finding index in rightturn array
-        for (int i = 0; i < rightTurn.length; i++){
-          if (rightTurn[i].equals(lastDirection)){
-            lastDirIndex = i;
-          }
-          if (rightTurn[i].equals(newDirection)){
-            newDirIndex = i;
-          }
-        }
-        
-        if (lastDirIndex < newDirIndex || (lastDirIndex == 3 && newDirIndex == 0)){  
-          instruction += "right ";
-        }
-        else {
-          instruction += "left ";
-        }
-        
-        instruction += "at room " + oldRoom.getName() + ".";
-      }
-      if (newRoom == null) {
-        instruction += "Walk " + distance + " more steps and you are at room " + oldRoom;
-      }
-      return instruction;
     }
     
     private String getRelationship(Room r1, Room r2){
@@ -246,8 +241,8 @@ public class Floor {
     
     r1.setNorth(r2);
     r2.setNorth(r3);
-    r3.setEast(r4);
-    r4.setSouth(r5);
+    r3.setWest(r4);
+    r4.setEast(r5);
     
     floor.addRoom(r1);
     floor.addRoom(r2);
