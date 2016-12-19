@@ -63,7 +63,8 @@ public class InstructionScreen extends JPanel{
     instructionLabel.setFont(new Font("Brandon Grotesque", Font.PLAIN, 16));
     add(instructionLabel);
     
-    instructions = new JLabel("Blah blah BLAH");
+    Queue<Room> directions = gui.getDirections();
+    instructions = new JLabel(gui.getDirections());
     instructions.setHorizontalAlignment(JLabel.CENTER);
     instructions.setForeground(new Color(94, 93, 92));
     instructions.setFont(new Font("Brandon Grotesque", Font.PLAIN, 14));

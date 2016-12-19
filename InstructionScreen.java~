@@ -1,3 +1,11 @@
+/*
+ * Author: Mojia Shen
+ * Purpose: InstructionScreen is the third screen. It has a button that takes the user back to the input screen
+ * It also has a panel that display a list of instructions
+ * It also has a button that ends the program.
+ * Date: Dec 17th 2016
+ * */
+
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -8,14 +16,6 @@ import java.awt.event.*;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Dimension;
-
-/*
- * Author: Mojia Shen
- * Purpose: InstructionScreen is the third screen. It has a button that takes the user back to the input screen
- * It also has a panel that display a list of instructions
- * It also has a button that ends the program.
- * Date: Dec 17th 2016
- * */
 
 public class InstructionScreen extends JPanel{
   private MapprGUI gui;
