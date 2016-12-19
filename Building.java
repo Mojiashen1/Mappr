@@ -233,12 +233,10 @@ public class Building {
           if(combinedWeight < minDistance) {
             minPath = new WeightedPath(combinedPath, combinedWeight);
             minDistance = combinedWeight;
-            instructions1 = fl1.getInstructions(fl1Path);
-            instructions2 = fl2.getInstructions(fl2Path);
+            instructions1 = fl1.getInstructions(r1, fl1.findRoomByName(e.getName()));
+            instructions2 = fl2.getInstructions(fl2.findRoomByName(e.getName()), r2);
 
-            System.out.println(fl1Path.getPath());
-
-            int floorDiff = fl1.getFloor() - fl2.getFloor();
+            int floorDiff = fl2.getFloor() - fl1.getFloor();
 
             instructions1.enqueue("Take the " + e.getName() + " " + getElevatorDirection(floorDiff) + " " + Math.abs(floorDiff) + " floors");
 
