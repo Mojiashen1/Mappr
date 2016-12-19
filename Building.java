@@ -171,6 +171,7 @@ public class Building {
 
       if(elevatorFloors.contains(floor2)) {
         floor1 = floor2;
+        r1 = getFloorByNumber(floor2).findRoomByName(r1.getName());
       } else {
         floor1 = minDifference(elevatorFloors, floor2);
       }
@@ -180,6 +181,7 @@ public class Building {
 
       if(elevatorFloors.contains(floor1)) {
         floor2 = floor1;
+        r2 = getFloorByNumber(floor1).findRoomByName(r2.getName());
       } else {
         floor2 = minDifference(elevatorFloors, floor1);
       }

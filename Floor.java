@@ -178,6 +178,7 @@ public class Floor {
         }
       }
 
+      if()
       this.instructions.enqueue("Take " + distance + " steps towards room " + next.toString());
       
       return instructions;
@@ -209,22 +210,22 @@ public class Floor {
       String n1 = r1.getName();
       String n2 = r2.getName();
       if (r1.getNorth() != null) {
-        if (r1.getNorth().getName() == n2) {
+        if (r1.getNorth().getName().equals(n2)) {
           return "north";
         }
       }
       else if (r1.getEast() != null) {
-        if (r1.getEast().getName() == n2) {
+        if (r1.getEast().getName().equals(n2)) {
           return "east";
         } 
       } 
       else if (r1.getSouth() != null) {
-        if (r1.getSouth().getName() == n2) {
+        if (r1.getSouth().getName().equals(n2)) {
           return "south";
         } 
       }
       else if (r1.getWest() != null) {
-        if (r1.getWest().getName() == n2) {
+        if (r1.getWest().getName().equals(n2)) {
           return "west";
         }
       }
